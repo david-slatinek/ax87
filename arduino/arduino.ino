@@ -1,12 +1,17 @@
 #include <DHT.h>
 #include <MQ135.h>
+#include "MQ7.h"
 
 #define DHTPIN 7
 #define DHTTYPE DHT22
-#define PIN A2
-
 DHT dht(DHTPIN, DHTTYPE);
-MQ135 mq135(PIN);
+
+#define PIN_MQ135 A2
+MQ135 mq135(PIN_MQ135);
+
+#define PIN_MQ7 1
+#define VOLTAGE 5
+MQ7 mq7(PIN_MQ7, VOLTAGE);
 
 void setup() {
   Serial.begin(9600);
@@ -16,6 +21,10 @@ void setup() {
   }
 
   dht.begin();
+
+  Serial.println("Calibrating MQ7");
+  mq7.calibrate();
+  Serial.println("Calibration done!");
 }
 
 float handleMq135() {
@@ -34,11 +43,12 @@ void loop() {
 
   switch (Serial.parseInt()) {
     case 1:
-      Serial.println("mq7");
+      //Serial.println("mq7");
+      Serial.println(mq7.readPpm());
       break;
     case 2:
-      Serial.println(handleMq135());
       //Serial.println("mq135");
+      Serial.println(handleMq135());
       break;
     case 3:
       Serial.println("raindrop");
