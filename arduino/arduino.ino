@@ -25,7 +25,6 @@ float handleMq135() {
   if (isnan(temperature) || isnan(humidity)) {
     return mq135.getPPM();
   }
-
   return mq135.getCorrectedPPM(temperature, humidity);
 }
 
