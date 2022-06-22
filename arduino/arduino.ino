@@ -6,12 +6,14 @@
 #define DHTTYPE DHT22
 DHT dht(DHTPIN, DHTTYPE);
 
-#define PIN_MQ135 A2
+#define PIN_MQ135 A0
 MQ135 mq135(PIN_MQ135);
 
 #define PIN_MQ7 1
 #define VOLTAGE 5
 MQ7 mq7(PIN_MQ7, VOLTAGE);
+
+#define PIN_R A2
 
 void setup() {
   Serial.begin(9600);
@@ -51,7 +53,8 @@ void loop() {
       Serial.println(handleMq135());
       break;
     case 3:
-      Serial.println("raindrop");
+      //Serial.println("raindrop");
+      Serial.println(analogRead(PIN_R));
       break;
     case 4:
       Serial.println("moisture");
