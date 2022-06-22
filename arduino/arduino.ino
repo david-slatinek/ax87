@@ -15,6 +15,10 @@ MQ7 mq7(PIN_MQ7, VOLTAGE);
 
 #define PIN_R A2
 
+#define PIN_S A3
+#define AIR_VALUE 489
+#define WATER_VALUE 238
+
 void setup() {
   Serial.begin(9600);
 
@@ -57,7 +61,18 @@ void loop() {
       Serial.println(analogRead(PIN_R));
       break;
     case 4:
-      Serial.println("moisture");
+      //Serial.println("moisture");
+      int moistureValue = analogRead(PIN_S);
+      int moisturePercent = map(moistureValue, AIR_VALUE, WATER_VALUE, 0, 100);
+      //Serial.println(moistureValue);
+
+      if (moisturePercent >= 100) {
+        Serial.println(100);
+      } else if (moisturePercent <= 0) {
+        Serial.println(0);
+      } else {
+        Serial.println(moisturePercent);
+      }
       break;
   }
 }
