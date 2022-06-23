@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"time"
+	"strings"
 )
 
 func readFromSerial(s *serial.Port, id int) (float32, error) {
@@ -17,11 +18,6 @@ func readFromSerial(s *serial.Port, id int) (float32, error) {
 		return 0, err
 	}
 
-	//err = s.Flush()
-	//if err != nil {
-	//	log.Println(err)
-	//}
-
 	reader := bufio.NewReader(s)
 	result, err := reader.ReadBytes('\x00')
 	if err != nil {
@@ -29,6 +25,22 @@ func readFromSerial(s *serial.Port, id int) (float32, error) {
 		//log.Println(err)
 	}
 	fmt.Println(result)
+
+	//i := 0
+	//for _, v := range result {
+	//	if v != 32 {
+	//		i++
+	//	}
+	//}
+
+	//result = result[i : len(result)-1]
+
+	//res := string(result)
+	res := strings.TrimSpace(string(result))
+
+	fmt.Println(res)
+
+
 	//return result, nil
 
 	//fmt.Println("String:", string(buf[:]))
