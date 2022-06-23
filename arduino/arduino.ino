@@ -14,6 +14,10 @@ MQ135 mq135(PIN_MQ135);
 MQ7 mq7(PIN_MQ7, VOLTAGE);
 
 #define PIN_R A2
+#define MIN_VALUE 0
+#define MAX_VALUE 1024
+#define MIN_CAT 0
+#define MAX_CAT 3
 
 #define PIN_S A3
 #define AIR_VALUE 489
@@ -28,9 +32,7 @@ void setup() {
 
   dht.begin();
 
-  Serial.println("Calibrating MQ7");
   mq7.calibrate();
-  Serial.println("Calibration done!");
 }
 
 float handleMq135() {
@@ -49,30 +51,16 @@ void loop() {
 
   switch (Serial.parseInt()) {
     case 1:
-      //Serial.println("mq7");
       Serial.println(mq7.readPpm());
       break;
     case 2:
-      //Serial.println("mq135");
       Serial.println(handleMq135());
       break;
     case 3:
-      //Serial.println("raindrop");
-      Serial.println(analogRead(PIN_R));
+      Serial.println(map(analogRead(PIN_R), MIN_VALUE, MAX_VALUE, MAX_CAT, MIN_CAT));
       break;
     case 4:
-      //Serial.println("moisture");
-      int moistureValue = analogRead(PIN_S);
-      int moisturePercent = map(moistureValue, AIR_VALUE, WATER_VALUE, 0, 100);
-      //Serial.println(moistureValue);
-
-      if (moisturePercent >= 100) {
-        Serial.println(100);
-      } else if (moisturePercent <= 0) {
-        Serial.println(0);
-      } else {
-        Serial.println(moisturePercent);
-      }
+      Serial.println(map(analogRead(PIN_S), AIR_VALUE, WATER_VALUE, 0, 100));
       break;
   }
 }
