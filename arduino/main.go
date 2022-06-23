@@ -10,32 +10,35 @@ import (
 	"time"
 )
 
-func readFromSerial(s *serial.Port, code int) (float32, error) {
-	n, err := s.Write([]byte("1"))
+func readFromSerial(s *serial.Port, id int) (float32, error) {
+	n, err := s.Write([]byte{byte(id)})
 	fmt.Println("First n:", n)
 	if err != nil {
-		fmt.Println("s.Write([]byte(\"1\"))")
-		log.Fatal(err)
+		return 0, err
 	}
 
-	err = s.Flush()
-	if err != nil {
-		log.Println(err)
-	}
+	//err = s.Flush()
+	//if err != nil {
+	//	log.Println(err)
+	//}
 
 	reader := bufio.NewReader(s)
-	reply, err := reader.ReadBytes('\x00')
+	result, err := reader.ReadBytes('\x00')
 	if err != nil {
-		log.Println(err)
+		return 0, err
+		//log.Println(err)
 	}
-	fmt.Println(reply)
+	fmt.Println(result)
+	//return result, nil
 
 	//fmt.Println("String:", string(buf[:]))
 	return 0, nil
 }
 
-func readCarbonMonoxide(s *serial.Port) (float32, error) {
-	return readFromSerial(s, 1)
+func handleError(err error) {
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func main() {
@@ -45,8 +48,7 @@ func main() {
 	flag.Parse()
 
 	if *readPtr < 0 || *readPtr > 4 {
-		log.Println("Invalid value for -read argument!")
-		log.Println("Exiting...")
+		log.Println("Invalid value for -read argument, exiting")
 		os.Exit(1)
 	}
 
@@ -56,19 +58,10 @@ func main() {
 		fmt.Println("serial.OpenPort")
 		log.Fatal(err)
 	}
-	defer func(s *serial.Port) {
-		err := s.Close()
-		if err != nil {
-			fmt.Println("s.Close()")
-			log.Println(err)
-		}
-	}(s)
 
-	_, err = readCarbonMonoxide(s)
-	if err != nil {
-		fmt.Println("readCarbonMonoxide(s)")
-		log.Println(err)
-	}
+	defer func(s *serial.Port) {
+		handleError(s.Close())
+	}(s)
 
 	//fmt.Println(*printPtr)
 }
