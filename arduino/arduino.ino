@@ -23,6 +23,8 @@ MQ7 mq7(PIN_MQ7, VOLTAGE);
 #define AIR_VALUE 489
 #define WATER_VALUE 238
 
+#define ARRAY_SIZE 12
+
 void setup() {
   Serial.begin(9600);
 
@@ -32,7 +34,7 @@ void setup() {
 
   dht.begin();
 
-  mq7.calibrate();
+  //mq7.calibrate();
 }
 
 float handleMq135() {
@@ -45,22 +47,33 @@ float handleMq135() {
   return mq135.getCorrectedPPM(temperature, humidity);
 }
 
+void respond(float a) {
+  char x[ARRAY_SIZE];
+  dtostrf(a, 8, 2, x);
+  x[ARRAY_SIZE - 1] = '\0';
+  Serial.write(x, ARRAY_SIZE);
+}
+
 void loop() {
   while (Serial.available() == 0) {
   }
 
   switch (Serial.parseInt()) {
     case 1:
-      Serial.println(mq7.readPpm());
+      respond(mq7.readPpm());
+      //Serial.print(mq7.readPpm());
       break;
     case 2:
-      Serial.println(handleMq135());
+      respond(handleMq135());
+      //Serial.println(handleMq135());
       break;
     case 3:
-      Serial.println(map(analogRead(PIN_R), MIN_VALUE, MAX_VALUE, MAX_CAT, MIN_CAT));
+      respond(map(analogRead(PIN_R), MIN_VALUE, MAX_VALUE, MAX_CAT, MIN_CAT));
+      //Serial.println(map(analogRead(PIN_R), MIN_VALUE, MAX_VALUE, MAX_CAT, MIN_CAT));
       break;
     case 4:
-      Serial.println(map(analogRead(PIN_S), AIR_VALUE, WATER_VALUE, 0, 100));
+      respond(map(analogRead(PIN_S), AIR_VALUE, WATER_VALUE, 0, 100));
+      //Serial.println(map(analogRead(PIN_S), AIR_VALUE, WATER_VALUE, 0, 100));
       break;
   }
 }
