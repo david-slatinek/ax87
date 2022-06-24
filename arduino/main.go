@@ -7,13 +7,13 @@ import (
 	"github.com/tarm/serial"
 	"log"
 	"os"
-	"time"
+	"strconv"
 	"strings"
+	"time"
 )
 
 func readFromSerial(s *serial.Port, id int) (float32, error) {
-	n, err := s.Write([]byte{byte(id)})
-	fmt.Println("First n:", n)
+	_, err := s.Write([]byte(strconv.Itoa(id)))
 	if err != nil {
 		return 0, err
 	}
@@ -22,40 +22,21 @@ func readFromSerial(s *serial.Port, id int) (float32, error) {
 	result, err := reader.ReadBytes('\x00')
 	if err != nil {
 		return 0, err
-		//log.Println(err)
 	}
-	fmt.Println(result)
 
-	//i := 0
-	//for _, v := range result {
-	//	if v != 32 {
-	//		i++
-	//	}
-	//}
-
-	//result = result[i : len(result)-1]
-
-	//res := string(result)
 	res := strings.TrimSpace(string(result))
+	res = strings.TrimSuffix(res, "\x00")
 
-	fmt.Println(res)
-
-
-	//return result, nil
-
-	//fmt.Println("String:", string(buf[:]))
-	return 0, nil
-}
-
-func handleError(err error) {
+	nr, err := strconv.ParseFloat(res, 32)
 	if err != nil {
-		log.Println(err)
+		return 0, err
 	}
+
+	return float32(nr), nil
 }
 
 func main() {
 	readPtr := flag.Int("read", 0, "Read sensor value/values\n\t0 = all (default)\n\t1 = carbon monoxide\n\t2 = air quality\n\t3 = raindrops\n\t4 = soil moisture")
-	//printPtr := flag.Bool("print", true, "Print read value/values")
 
 	flag.Parse()
 
@@ -67,13 +48,35 @@ func main() {
 	c := &serial.Config{Name: "/dev/ttyACM0", Baud: 9600, ReadTimeout: time.Second * 5}
 	s, err := serial.OpenPort(c)
 	if err != nil {
-		fmt.Println("serial.OpenPort")
 		log.Fatal(err)
 	}
-
 	defer func(s *serial.Port) {
-		handleError(s.Close())
+		err := s.Close()
+		if err != nil {
+			log.Println(err)
+		}
 	}(s)
 
-	//fmt.Println(*printPtr)
+	if *readPtr == 0 {
+		for i := 1; i <= 4; i++ {
+			data, err := readFromSerial(s, i)
+			if err != nil {
+				log.Println(err)
+				log.Println("Argument:", i)
+				continue
+			}
+			fmt.Println("Argument:", i)
+			fmt.Println("Result:", data)
+
+			time.Sleep(time.Second)
+		}
+		return
+	}
+
+	data, err := readFromSerial(s, *readPtr)
+	if err != nil {
+		log.Println(err)
+	} else {
+		fmt.Println("Result:", data)
+	}
 }
