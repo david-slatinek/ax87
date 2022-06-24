@@ -23,7 +23,7 @@ MQ7 mq7(PIN_MQ7, VOLTAGE);
 #define AIR_VALUE 489
 #define WATER_VALUE 238
 
-#define ARRAY_SIZE 12
+#define ARRAY_SIZE 20
 
 void setup() {
   Serial.begin(9600);
@@ -34,7 +34,7 @@ void setup() {
 
   dht.begin();
 
-  //mq7.calibrate();
+  mq7.calibrate();
 }
 
 float handleMq135() {
@@ -49,7 +49,8 @@ float handleMq135() {
 
 void respond(float a) {
   char x[ARRAY_SIZE];
-  dtostrf(a, 8, 2, x);
+  memset(x, 0, sizeof(x));
+  dtostrf(a, 14, 2, x);
   x[ARRAY_SIZE - 1] = '\0';
   Serial.write(x, ARRAY_SIZE);
 }
