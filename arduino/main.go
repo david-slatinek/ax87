@@ -60,13 +60,13 @@ func main() {
 	if *readPtr == 0 {
 		for i := 1; i <= 4; i++ {
 			data, err := readFromSerial(s, i)
+			log.Println("Argument:", i)
+
 			if err != nil {
 				log.Println(err)
-				log.Println("Argument:", i)
-				continue
+			} else {
+				fmt.Println("Result:", data)
 			}
-			fmt.Println("Argument:", i)
-			fmt.Println("Result:", data)
 
 			time.Sleep(time.Second)
 		}
