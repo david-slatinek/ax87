@@ -3,10 +3,10 @@ package main
 type DataType int
 
 const (
-	carbon_monoxide DataType = iota
-	air_quality
+	carbonMonoxide DataType = iota
+	airQuality
 	raindrops
-	soil_moisture
+	soilMoisture
 )
 
 func (dt DataType) String() string {

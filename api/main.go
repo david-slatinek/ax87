@@ -23,13 +23,8 @@ func main() {
 	}
 	defer db.client.Close()
 
-	//err = db.Init()
-	//if err != nil {
-	//	log.Fatalf(err.Error())
-	//}
-
 	db.Add(&Data{
-		DataType: carbon_monoxide,
+		DataType: carbonMonoxide,
 		Value:    10.78,
 	})
 }
