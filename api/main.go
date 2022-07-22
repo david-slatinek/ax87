@@ -5,14 +5,20 @@ import (
 )
 
 func main() {
-	err := loadENV()
+	err := Load(".env")
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
 
-	client, err := connectToDB()
+	err = Validate()
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
-	defer client.Close()
+
+	db := DB{}
+	err = db.connectToDB()
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	defer db.client.Close()
 }
