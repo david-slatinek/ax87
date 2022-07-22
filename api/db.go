@@ -33,8 +33,7 @@ func (db *DB) Init() error {
 
 	bucket, err := db.client.BucketsAPI().FindBucketByName(ctx, db.bucket)
 	if err == nil {
-		err := db.client.BucketsAPI().DeleteBucketWithID(context.Background(), *bucket.Id)
-		if err != nil {
+		if err := db.client.BucketsAPI().DeleteBucketWithID(context.Background(), *bucket.Id); err != nil {
 			return err
 		}
 	}
@@ -45,19 +44,30 @@ func (db *DB) Init() error {
 	}
 
 	_, err = db.client.BucketsAPI().CreateBucketWithNameWithID(ctx, *org.Id, db.bucket)
+	return err
+}
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+// MapValue from one range to another.
+func MapValue(x int, inMin int, inMax int, outMin int, outMax int) int {
+	return (x-inMin)*(outMax-outMin)/(inMax-inMin) + outMin
 }
 
 // Add new data to db.
 func (db *DB) Add(data *Data) {
 	writeAPI := db.client.WriteAPI(db.org, db.bucket)
-	p := influxdb2.NewPointWithMeasurement("measure").
-		AddTag("type", data.DataType.String()).AddField("value", data.Value)
+	p := influxdb2.NewPointWithMeasurement(data.DataType.String()).AddField("value", data.Value)
+
+	if data.DataType == carbonMonoxide || data.DataType == airQuality {
+		var category int
+
+		switch data.DataType {
+		case carbonMonoxide:
+			category = MapValue(int(data.Value), 0, 13000, 0, 3)
+		case airQuality:
+			category = MapValue(int(data.Value), 0, 500, 0, 5)
+		}
+		p.AddField("category", category)
+	}
 
 	writeAPI.WritePoint(p)
 	writeAPI.Flush()
