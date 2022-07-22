@@ -1,17 +1,18 @@
 package main
 
 import (
-	"fmt"
-	"github.com/joho/godotenv"
 	"log"
-	"os"
 )
 
 func main() {
-	err := godotenv.Load(".env")
+	err := loadENV()
 	if err != nil {
-		log.Fatalf("Error loading .env file!")
+		log.Fatalf(err.Error())
 	}
 
-	fmt.Printf(os.Getenv("INFLUXDB_TOKEN"))
+	client, err := connectToDB()
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	defer client.Close()
 }
