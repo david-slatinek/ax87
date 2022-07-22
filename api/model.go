@@ -10,7 +10,7 @@ const (
 )
 
 func (dt DataType) String() string {
-	return []string{"carbon_monoxide", "air_quality", "raindrops", "soil_moisture"}[dt]
+	return []string{"carbonMonoxide", "airQuality", "raindrops", "soilMoisture"}[dt]
 }
 
 type Data struct {
