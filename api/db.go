@@ -252,3 +252,10 @@ func (db *DB) Max(dataType string) (float32, error) {
 			|> filter(fn: (r) => r._measurement == "%s" and r._field == "value")
 			|> max()`, db.bucket, dataType))
 }
+
+func (db *DB) Min(dataType string) (float32, error) {
+	return db.RetrieveData(fmt.Sprintf(`from(bucket:"%s")
+			|> range(start: -1d)
+			|> filter(fn: (r) => r._measurement == "%s" and r._field == "value")
+			|> min()`, db.bucket, dataType))
+}

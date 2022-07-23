@@ -57,7 +57,13 @@ func main() {
 	//}
 	//fmt.Println(res)
 
-	res, err := db.Max(carbonMonoxide)
+	//res, err := db.Max(carbonMonoxide)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(res)
+
+	res, err := db.Min(carbonMonoxide)
 	if err != nil {
 		fmt.Println(err)
 	}
