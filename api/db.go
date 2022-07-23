@@ -139,9 +139,62 @@ func (db *DB) Latest(dataType string) (*DataResponse, error) {
 			if res, ok := result.Record().Value().(float64); ok {
 				dr.Value = float32(res)
 			}
+
+			dr.DataType = result.Record().Measurement()
 		}
 	}
-	dr.DataType = result.Record().Measurement()
 
 	return &dr, nil
+}
+
+// Last24H returns data for the last 24 hours for the requested dataType.
+func (db *DB) Last24H(dataType string) ([]DataResponse, error) {
+	queryAPI := db.client.QueryAPI(db.org)
+	query := fmt.Sprintf(`from(bucket:"%s")
+			|> range(start: -1d)
+			|> filter(fn: (r) => r._measurement == "%s")`, db.bucket, dataType)
+
+	result, err := queryAPI.Query(context.Background(), query)
+	if err != nil || result.Err() != nil {
+		return nil, err
+	}
+
+	var categories []int
+	var values []float32
+
+	for result.Next() {
+		if result.Record().Field() == "category" {
+			if res, ok := result.Record().Value().(int64); ok {
+				categories = append(categories, int(res))
+			} else {
+				categories = append(categories, -1)
+			}
+		}
+
+		if result.Record().Field() == "value" {
+			if res, ok := result.Record().Value().(float64); ok {
+				values = append(values, float32(res))
+			} else {
+				values = append(values, -1)
+			}
+		}
+	}
+
+	if len(categories) != len(values) {
+		return nil, errors.New("length of categories is different than length of values")
+	}
+
+	var data []DataResponse
+
+	for k, v := range categories {
+		data = append(data, DataResponse{
+			Data: Data{
+				DataType: dataType,
+				Value:    values[k],
+			},
+			Category: v,
+		})
+	}
+
+	return data, nil
 }

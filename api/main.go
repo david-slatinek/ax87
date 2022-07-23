@@ -24,14 +24,32 @@ func main() {
 	}
 	defer db.client.Close()
 
+	//err = db.Init()
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//
 	//db.Add(&Data{
 	//	DataType: carbonMonoxide,
 	//	Value:    450.78,
 	//})
+	//
+	//db.Add(&Data{
+	//	DataType: carbonMonoxide,
+	//	Value:    102.1,
+	//})
 
-	res, err := db.Latest(carbonMonoxide)
+	//res, err := db.Latest(carbonMonoxide)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(res)
+
+	res, err := db.Last24H(carbonMonoxide)
 	if err != nil {
 		fmt.Println(err)
 	}
+	fmt.Println()
 	fmt.Println(res)
+
 }
