@@ -132,17 +132,20 @@ func (db *DB) Latest(dataType string) (*DataResponse, error) {
 		if result.Record().Field() == "category" {
 			if res, ok := result.Record().Value().(int64); ok {
 				dr.Category = int(res)
+			} else {
+				dr.Category = -1
 			}
 		}
 
 		if result.Record().Field() == "value" {
 			if res, ok := result.Record().Value().(float64); ok {
 				dr.Value = float32(res)
+			} else {
+				dr.Value = -1
 			}
-
-			dr.DataType = result.Record().Measurement()
 		}
 	}
+	dr.DataType = result.Record().Measurement()
 
 	return &dr, nil
 }

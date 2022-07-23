@@ -32,7 +32,12 @@ func main() {
 	//db.Add(&Data{
 	//	DataType: carbonMonoxide,
 	//	Value:    450.78,
-	//})
+	//})	res, err := db.Last24H(carbonMonoxide)
+	//	if err != nil {
+	//		fmt.Println(err)
+	//	}
+	//	fmt.Println()
+	//	fmt.Println(res)
 	//
 	//db.Add(&Data{
 	//	DataType: carbonMonoxide,
@@ -51,5 +56,4 @@ func main() {
 	}
 	fmt.Println()
 	fmt.Println(res)
-
 }
