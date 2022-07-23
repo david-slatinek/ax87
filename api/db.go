@@ -217,3 +217,28 @@ func (db *DB) Last24H(dataType string) ([]DataResponse, error) {
 
 	return data, nil
 }
+
+func (db *DB) Median(dataType string) (float32, error) {
+	queryAPI := db.client.QueryAPI(db.org)
+	query := fmt.Sprintf(`from(bucket:"%s")
+			|> range(start: -1d)
+			|> filter(fn: (r) => r._measurement == "%s" and r._field == "value")
+			|> median()`, db.bucket, dataType)
+
+	result, err := queryAPI.Query(context.Background(), query)
+	if err != nil || result.Err() != nil {
+		return 0, err
+	}
+
+	var median float32
+
+	for result.Next() {
+		if res, ok := result.Record().Value().(float64); ok {
+			median = float32(res)
+		} else {
+			median = -1
+		}
+	}
+
+	return median, nil
+}

@@ -45,7 +45,13 @@ func main() {
 	//}
 	//fmt.Println(res)
 
-	res, err := db.Last24H(carbonMonoxide)
+	//res, err := db.Last24H(carbonMonoxide)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(res)
+
+	res, err := db.Median(carbonMonoxide)
 	if err != nil {
 		fmt.Println(err)
 	}
