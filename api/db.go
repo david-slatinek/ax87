@@ -104,9 +104,9 @@ func (db *DB) Add(data *Data) {
 		p.AddField("value", data.Value)
 		p.AddField("category", MapAir(int(data.Value)))
 	case raindrops:
-		p.AddField("category", data.Value)
+		p.AddField("category", int(data.Value))
 	case soilMoisture:
-		p.AddField("category", data.Value)
+		p.AddField("category", int(data.Value))
 	}
 
 	writeAPI.WritePoint(p)
@@ -144,8 +144,12 @@ func (db *DB) Latest(dataType string) (*DataResponse, error) {
 				dr.Value = -1
 			}
 		}
+		dr.DataType = result.Record().Measurement()
 	}
-	dr.DataType = result.Record().Measurement()
+
+	if dataType == raindrops || dataType == soilMoisture {
+		dr.Value = -1
+	}
 
 	return &dr, nil
 }
@@ -183,20 +187,32 @@ func (db *DB) Last24H(dataType string) ([]DataResponse, error) {
 		}
 	}
 
-	if len(categories) != len(values) {
-		return nil, errors.New("length of categories is different than length of values")
-	}
-
 	var data []DataResponse
 
-	for k, v := range categories {
-		data = append(data, DataResponse{
-			Data: Data{
-				DataType: dataType,
-				Value:    values[k],
-			},
-			Category: v,
-		})
+	if dataType == carbonMonoxide || dataType == airQuality {
+		if len(categories) != len(values) {
+			return nil, errors.New("length of categories is different than length of values")
+		}
+
+		for index, value := range categories {
+			data = append(data, DataResponse{
+				Data: Data{
+					DataType: dataType,
+					Value:    values[index],
+				},
+				Category: value,
+			})
+		}
+	} else {
+		for _, value := range categories {
+			data = append(data, DataResponse{
+				Data: Data{
+					DataType: dataType,
+					Value:    -1,
+				},
+				Category: value,
+			})
+		}
 	}
 
 	return data, nil
