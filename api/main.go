@@ -26,7 +26,7 @@ func main() {
 
 	//db.Add(&Data{
 	//	DataType: carbonMonoxide,
-	//	Value:    10.78,
+	//	Value:    450.78,
 	//})
 
 	res, err := db.Latest(carbonMonoxide)

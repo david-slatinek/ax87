@@ -55,9 +55,40 @@ func (db *DB) Init() error {
 	return err
 }
 
-// MapValue from one range to another.
-func MapValue(x int, inMin int, inMax int, outMin int, outMax int) int {
-	return (x-inMin)*(outMax-outMin)/(inMax-inMin) + outMin
+// MapCO2 value to 7 categories, with 1 being the best.
+func MapCO2(value int) int {
+	if value < 0 && value <= 30 {
+		return 1
+	} else if value > 30 && value <= 70 {
+		return 2
+	} else if value > 70 && value <= 150 {
+		return 3
+	} else if value > 150 && value <= 200 {
+		return 4
+	} else if value > 200 && value <= 400 {
+		return 5
+	} else if value > 400 && value <= 800 {
+		return 6
+	}
+
+	return 7
+}
+
+// MapAir quality value to 6 categories, with 1 being the best.
+func MapAir(value int) int {
+	if value < 0 && value <= 50 {
+		return 1
+	} else if value > 50 && value <= 100 {
+		return 2
+	} else if value > 100 && value <= 150 {
+		return 3
+	} else if value > 150 && value <= 200 {
+		return 4
+	} else if value > 200 && value <= 300 {
+		return 5
+	}
+
+	return 6
 }
 
 // Add new data to db.
@@ -68,10 +99,10 @@ func (db *DB) Add(data *Data) {
 	switch data.DataType {
 	case carbonMonoxide:
 		p.AddField("value", data.Value)
-		p.AddField("category", MapValue(int(data.Value), 0, 13000, 0, 3))
+		p.AddField("category", MapCO2(int(data.Value)))
 	case airQuality:
 		p.AddField("value", data.Value)
-		p.AddField("category", MapValue(int(data.Value), 0, 500, 0, 5))
+		p.AddField("category", MapAir(int(data.Value)))
 	case raindrops:
 		p.AddField("category", data.Value)
 	case soilMoisture:
@@ -82,18 +113,20 @@ func (db *DB) Add(data *Data) {
 	writeAPI.Flush()
 }
 
+// Latest returns the latest data for the requested dataType.
 func (db *DB) Latest(dataType string) (*DataResponse, error) {
 	queryAPI := db.client.QueryAPI(db.org)
-	query := fmt.Sprintf("from(bucket:\"%s\") |> range(start: -2d) |> filter(fn: (r) => r._measurement == \"%s\") |> last()", db.bucket, dataType)
+	query := fmt.Sprintf(`from(bucket:"%s")
+			|> range(start: 0)
+			|> filter(fn: (r) => r._measurement == "%s")
+			|> last()`, db.bucket, dataType)
 
-	//fmt.Println(query)
+	dr := DataResponse{}
 
 	result, err := queryAPI.Query(context.Background(), query)
 	if err != nil || result.Err() != nil {
-		return &DataResponse{}, err
+		return &dr, err
 	}
-
-	dr := DataResponse{}
 
 	for result.Next() {
 		if result.Record().Field() == "category" {
