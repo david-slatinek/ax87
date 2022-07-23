@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/domain"
 	"os"
@@ -62,7 +63,7 @@ func MapValue(x int, inMin int, inMax int, outMin int, outMax int) int {
 // Add new data to db.
 func (db *DB) Add(data *Data) {
 	writeAPI := db.client.WriteAPI(db.org, db.bucket)
-	p := influxdb2.NewPointWithMeasurement(data.DataType.String())
+	p := influxdb2.NewPointWithMeasurement(data.DataType)
 
 	switch data.DataType {
 	case carbonMonoxide:
@@ -79,4 +80,35 @@ func (db *DB) Add(data *Data) {
 
 	writeAPI.WritePoint(p)
 	writeAPI.Flush()
+}
+
+func (db *DB) Latest(dataType string) (*DataResponse, error) {
+	queryAPI := db.client.QueryAPI(db.org)
+	query := fmt.Sprintf("from(bucket:\"%s\") |> range(start: -2d) |> filter(fn: (r) => r._measurement == \"%s\") |> last()", db.bucket, dataType)
+
+	//fmt.Println(query)
+
+	result, err := queryAPI.Query(context.Background(), query)
+	if err != nil || result.Err() != nil {
+		return &DataResponse{}, err
+	}
+
+	dr := DataResponse{}
+
+	for result.Next() {
+		if result.Record().Field() == "category" {
+			if res, ok := result.Record().Value().(int64); ok {
+				dr.Category = int(res)
+			}
+		}
+
+		if result.Record().Field() == "value" {
+			if res, ok := result.Record().Value().(float64); ok {
+				dr.Value = float32(res)
+			}
+		}
+	}
+	dr.DataType = result.Record().Measurement()
+
+	return &dr, nil
 }

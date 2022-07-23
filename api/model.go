@@ -1,19 +1,28 @@
 package main
 
-type DataType int
+import "fmt"
 
 const (
-	carbonMonoxide DataType = iota
-	airQuality
-	raindrops
-	soilMoisture
+	carbonMonoxide = "carbonMonoxide"
+	airQuality     = "airQuality"
+	raindrops      = "raindrops"
+	soilMoisture   = "soilMoisture"
 )
 
-func (dt DataType) String() string {
-	return []string{"carbonMonoxide", "airQuality", "raindrops", "soilMoisture"}[dt]
+type Data struct {
+	DataType string
+	Value    float32
 }
 
-type Data struct {
-	DataType DataType
-	Value    float32
+type DataResponse struct {
+	Data
+	Category int
+}
+
+func (d Data) String() string {
+	return fmt.Sprintf("DataType: %s, Value: %f", d.DataType, d.Value)
+}
+
+func (dr DataResponse) String() string {
+	return fmt.Sprintf("%s, Category: %d", dr.Data, dr.Category)
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 )
@@ -23,8 +24,14 @@ func main() {
 	}
 	defer db.client.Close()
 
-	db.Add(&Data{
-		DataType: carbonMonoxide,
-		Value:    10.78,
-	})
+	//db.Add(&Data{
+	//	DataType: carbonMonoxide,
+	//	Value:    10.78,
+	//})
+
+	res, err := db.Latest(carbonMonoxide)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(res)
 }
