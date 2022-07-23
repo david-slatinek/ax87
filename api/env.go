@@ -11,7 +11,7 @@ func Load(fileName string) error {
 	return godotenv.Load(fileName)
 }
 
-// Validate loaded env variables
+// Validate loaded env variables.
 func Validate() error {
 	if os.Getenv("INFLUXDB_TOKEN") == "" {
 		return errors.New("empty INFLUXDB_TOKEN")

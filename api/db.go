@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/domain"
 	"os"
@@ -20,8 +21,12 @@ func (db *DB) Connect() error {
 		influxdb2.DefaultOptions().SetUseGZip(true))
 
 	status, err := db.client.Health(context.Background())
-	if status.Status != domain.HealthCheckStatusPass {
+	if err != nil {
 		return err
+	}
+
+	if status.Status != domain.HealthCheckStatusPass {
+		return errors.New("server error")
 	}
 
 	return nil
@@ -32,7 +37,9 @@ func (db *DB) Init() error {
 	ctx := context.Background()
 
 	bucket, err := db.client.BucketsAPI().FindBucketByName(ctx, db.bucket)
-	if err == nil {
+	if err != nil {
+		return err
+	} else {
 		if err := db.client.BucketsAPI().DeleteBucketWithID(context.Background(), *bucket.Id); err != nil {
 			return err
 		}
@@ -55,18 +62,19 @@ func MapValue(x int, inMin int, inMax int, outMin int, outMax int) int {
 // Add new data to db.
 func (db *DB) Add(data *Data) {
 	writeAPI := db.client.WriteAPI(db.org, db.bucket)
-	p := influxdb2.NewPointWithMeasurement(data.DataType.String()).AddField("value", data.Value)
+	p := influxdb2.NewPointWithMeasurement(data.DataType.String())
 
-	if data.DataType == carbonMonoxide || data.DataType == airQuality {
-		var category int
-
-		switch data.DataType {
-		case carbonMonoxide:
-			category = MapValue(int(data.Value), 0, 13000, 0, 3)
-		case airQuality:
-			category = MapValue(int(data.Value), 0, 500, 0, 5)
-		}
-		p.AddField("category", category)
+	switch data.DataType {
+	case carbonMonoxide:
+		p.AddField("value", data.Value)
+		p.AddField("category", MapValue(int(data.Value), 0, 13000, 0, 3))
+	case airQuality:
+		p.AddField("value", data.Value)
+		p.AddField("category", MapValue(int(data.Value), 0, 500, 0, 5))
+	case raindrops:
+		p.AddField("category", data.Value)
+	case soilMoisture:
+		p.AddField("category", data.Value)
 	}
 
 	writeAPI.WritePoint(p)
