@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 )
@@ -56,25 +55,25 @@ func main() {
 	//}
 	//fmt.Println(res)
 
-	res, err := db.Last24H(soilMoisture)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(res)
-
-	//res, err := db.Median(carbonMonoxide)
+	//res, err := db.Last24H(soilMoisture)
 	//if err != nil {
 	//	fmt.Println(err)
 	//}
 	//fmt.Println(res)
 
-	//res, err := db.Max(carbonMonoxide)
+	//res, err := db.Median(soilMoisture)
 	//if err != nil {
 	//	fmt.Println(err)
 	//}
 	//fmt.Println(res)
 
-	//res, err := db.Min(carbonMonoxide)
+	//res, err := db.Max(soilMoisture)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(res)
+
+	//res, err := db.Min(soilMoisture)
 	//if err != nil {
 	//	fmt.Println(err)
 	//}

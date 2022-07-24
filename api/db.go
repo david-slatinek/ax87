@@ -197,7 +197,7 @@ func (db *DB) Last24H(dataType string) (*[]DataResponse, error) {
 	}
 
 	if len(categories) != len(values) {
-		return nil, errors.New("length of categories is different than length of values")
+		return nil, errors.New("the length of categories is different than the length of values")
 	}
 
 	var data []DataResponse
@@ -220,20 +220,15 @@ func (db *DB) RetrieveData(query string) (float32, error) {
 
 	result, err := queryAPI.Query(context.Background(), query)
 	if err != nil || result.Err() != nil {
-		return 0, err
+		return -1, err
 	}
-
-	var data float32
 
 	for result.Next() {
 		if res, ok := result.Record().Value().(float64); ok {
-			data = float32(res)
-		} else {
-			data = -1
+			return float32(res), nil
 		}
 	}
-
-	return data, nil
+	return -1, errors.New("the conversion was not successful")
 }
 
 func (db *DB) Median(dataType string) (float32, error) {
