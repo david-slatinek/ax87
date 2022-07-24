@@ -34,10 +34,20 @@ func main() {
 	//	DataType: carbonMonoxide,
 	//	Value:    40.78,
 	//})
-
+	//
+	//db.Add(&Data{
+	//	DataType: airQuality,
+	//	Value:    120.4,
+	//})
+	//
 	//db.Add(&Data{
 	//	DataType: raindrops,
-	//	Value:    2,
+	//	Value:    100,
+	//})
+	//
+	//db.Add(&Data{
+	//	DataType: soilMoisture,
+	//	Value:    300,
 	//})
 
 	res, err := db.Latest(soilMoisture)

@@ -91,22 +91,27 @@ func MapAir(value int) int {
 	return 6
 }
 
+// MapValue from one range to another.
+func MapValue(x int, inMin int, inMax int, outMin int, outMax int) int {
+	return (x-inMin)*(outMax-outMin)/(inMax-inMin) + outMin
+}
+
 // Add new data to db.
 func (db *DB) Add(data *Data) {
 	writeAPI := db.client.WriteAPI(db.org, db.bucket)
-	p := influxdb2.NewPointWithMeasurement(data.DataType).SetTime(time.Now())
+	p := influxdb2.NewPointWithMeasurement(data.DataType).AddField("value", data.Value).SetTime(time.Now())
 
 	switch data.DataType {
 	case carbonMonoxide:
-		p.AddField("value", data.Value)
 		p.AddField("category", MapCO2(int(data.Value)))
 	case airQuality:
-		p.AddField("value", data.Value)
 		p.AddField("category", MapAir(int(data.Value)))
 	case raindrops:
-		p.AddField("category", int(data.Value))
+		p.AddField("category", MapValue(int(data.Value), 0, 1024, 1, 4))
 	case soilMoisture:
-		p.AddField("category", int(data.Value))
+		p.AddField("category", MapValue(int(data.Value), 489, 238, 0, 100))
+	default:
+		return
 	}
 
 	writeAPI.WritePoint(p)
@@ -154,10 +159,6 @@ func (db *DB) Latest(dataType string) (*DataResponse, error) {
 	}
 
 	dr.DataType = result.Record().Measurement()
-
-	if dataType == raindrops || dataType == soilMoisture {
-		dr.Value = -1
-	}
 
 	return &dr, nil
 }
