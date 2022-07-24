@@ -42,7 +42,7 @@ func main() {
 	//
 	//db.Add(&Data{
 	//	DataType: raindrops,
-	//	Value:    100,
+	//	Value:    200,
 	//})
 	//
 	//db.Add(&Data{
@@ -50,17 +50,17 @@ func main() {
 	//	Value:    300,
 	//})
 
-	res, err := db.Latest(soilMoisture)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(res)
-
-	//res, err := db.Last24H(carbonMonoxide)
+	//res, err := db.Latest(soilMoisture)
 	//if err != nil {
 	//	fmt.Println(err)
 	//}
 	//fmt.Println(res)
+
+	res, err := db.Last24H(soilMoisture)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(res)
 
 	//res, err := db.Median(carbonMonoxide)
 	//if err != nil {

@@ -164,7 +164,7 @@ func (db *DB) Latest(dataType string) (*DataResponse, error) {
 }
 
 // Last24H returns data for the last 24 hours for the requested dataType.
-func (db *DB) Last24H(dataType string) ([]DataResponse, error) {
+func (db *DB) Last24H(dataType string) (*[]DataResponse, error) {
 	queryAPI := db.client.QueryAPI(db.org)
 	query := fmt.Sprintf(`from(bucket:"%s")
 			|> range(start: -1d)
@@ -196,35 +196,23 @@ func (db *DB) Last24H(dataType string) ([]DataResponse, error) {
 		}
 	}
 
-	var data []DataResponse
-
-	if dataType == carbonMonoxide || dataType == airQuality {
-		if len(categories) != len(values) {
-			return nil, errors.New("length of categories is different than length of values")
-		}
-
-		for index, value := range categories {
-			data = append(data, DataResponse{
-				Data: Data{
-					DataType: dataType,
-					Value:    values[index],
-				},
-				Category: value,
-			})
-		}
-	} else {
-		for _, value := range categories {
-			data = append(data, DataResponse{
-				Data: Data{
-					DataType: dataType,
-					Value:    -1,
-				},
-				Category: value,
-			})
-		}
+	if len(categories) != len(values) {
+		return nil, errors.New("length of categories is different than length of values")
 	}
 
-	return data, nil
+	var data []DataResponse
+
+	for index, value := range categories {
+		data = append(data, DataResponse{
+			Data: Data{
+				DataType: dataType,
+				Value:    values[index],
+			},
+			Category: value,
+		})
+	}
+
+	return &data, nil
 }
 
 func (db *DB) RetrieveData(query string) (float32, error) {
