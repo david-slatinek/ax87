@@ -17,7 +17,8 @@ func main() {
 		log.Fatalf(err.Error())
 	}
 
-	db := DB{org: os.Getenv("ORGANIZATION"), bucket: os.Getenv("BUCKET")}
+	db := DB{url: os.Getenv("INFLUXDB_URL"), token: os.Getenv("INFLUXDB_TOKEN"),
+		org: os.Getenv("ORGANIZATION"), bucket: os.Getenv("BUCKET")}
 	err = db.Connect()
 	if err != nil {
 		log.Fatalf(err.Error())

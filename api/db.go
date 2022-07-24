@@ -6,19 +6,21 @@ import (
 	"fmt"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/domain"
-	"os"
+	"time"
 )
 
 // DB struct for db management.
 type DB struct {
 	client influxdb2.Client
+	url    string
+	token  string
 	org    string
 	bucket string
 }
 
 // Connect to the influxdb server.
 func (db *DB) Connect() error {
-	db.client = influxdb2.NewClientWithOptions(os.Getenv("INFLUXDB_URL"), os.Getenv("INFLUXDB_TOKEN"),
+	db.client = influxdb2.NewClientWithOptions(db.url, db.token,
 		influxdb2.DefaultOptions().SetUseGZip(true))
 
 	status, err := db.client.Health(context.Background())
@@ -40,10 +42,10 @@ func (db *DB) Init() error {
 	bucket, err := db.client.BucketsAPI().FindBucketByName(ctx, db.bucket)
 	if err != nil {
 		return err
-	} else {
-		if err := db.client.BucketsAPI().DeleteBucketWithID(context.Background(), *bucket.Id); err != nil {
-			return err
-		}
+	}
+
+	if err := db.client.BucketsAPI().DeleteBucketWithID(context.Background(), *bucket.Id); err != nil {
+		return err
 	}
 
 	org, err := db.client.OrganizationsAPI().FindOrganizationByName(ctx, db.org)
@@ -70,7 +72,6 @@ func MapCO2(value int) int {
 	} else if value > 400 && value <= 800 {
 		return 6
 	}
-
 	return 7
 }
 
@@ -87,14 +88,13 @@ func MapAir(value int) int {
 	} else if value > 200 && value <= 300 {
 		return 5
 	}
-
 	return 6
 }
 
 // Add new data to db.
 func (db *DB) Add(data *Data) {
 	writeAPI := db.client.WriteAPI(db.org, db.bucket)
-	p := influxdb2.NewPointWithMeasurement(data.DataType)
+	p := influxdb2.NewPointWithMeasurement(data.DataType).SetTime(time.Now())
 
 	switch data.DataType {
 	case carbonMonoxide:
