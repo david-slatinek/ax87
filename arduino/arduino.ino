@@ -16,8 +16,8 @@ MQ7 mq7(PIN_MQ7, VOLTAGE);
 #define PIN_R A2
 #define MIN_VALUE 0
 #define MAX_VALUE 1024
-#define MIN_CAT 0
-#define MAX_CAT 3
+#define MIN_CAT 1
+#define MAX_CAT 4
 
 #define PIN_S A3
 #define AIR_VALUE 489
