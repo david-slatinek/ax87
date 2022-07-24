@@ -14,14 +14,14 @@ MQ135 mq135(PIN_MQ135);
 MQ7 mq7(PIN_MQ7, VOLTAGE);
 
 #define PIN_R A2
-#define MIN_VALUE 0
-#define MAX_VALUE 1024
-#define MIN_CAT 1
-#define MAX_CAT 4
+//#define MIN_VALUE 0
+//#define MAX_VALUE 1024
+//#define MIN_CAT 1
+//#define MAX_CAT 4
 
 #define PIN_S A3
-#define AIR_VALUE 489
-#define WATER_VALUE 238
+//#define AIR_VALUE 489
+//#define WATER_VALUE 238
 
 #define ARRAY_SIZE 20
 
@@ -69,11 +69,13 @@ void loop() {
       //Serial.println(handleMq135());
       break;
     case 3:
-      respond(map(analogRead(PIN_R), MIN_VALUE, MAX_VALUE, MAX_CAT, MIN_CAT));
+      respond(analogRead(PIN_R));
+      //respond(map(analogRead(PIN_R), MIN_VALUE, MAX_VALUE, MAX_CAT, MIN_CAT));
       //Serial.println(map(analogRead(PIN_R), MIN_VALUE, MAX_VALUE, MAX_CAT, MIN_CAT));
       break;
     case 4:
-      respond(map(analogRead(PIN_S), AIR_VALUE, WATER_VALUE, 0, 100));
+      respond(analogRead(PIN_S));
+      //respond(map(analogRead(PIN_S), AIR_VALUE, WATER_VALUE, 0, 100));
       //Serial.println(map(analogRead(PIN_S), AIR_VALUE, WATER_VALUE, 0, 100));
       break;
   }
