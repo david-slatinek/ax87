@@ -128,7 +128,10 @@ func (db *DB) Latest(dataType string) (*DataResponse, error) {
 		return &dr, err
 	}
 
+	isData := false
+
 	for result.Next() {
+		isData = true
 		if result.Record().Field() == "category" {
 			if res, ok := result.Record().Value().(int64); ok {
 				dr.Category = int(res)
@@ -144,8 +147,13 @@ func (db *DB) Latest(dataType string) (*DataResponse, error) {
 				dr.Value = -1
 			}
 		}
-		dr.DataType = result.Record().Measurement()
 	}
+
+	if !isData {
+		return &dr, errors.New("no data")
+	}
+
+	dr.DataType = result.Record().Measurement()
 
 	if dataType == raindrops || dataType == soilMoisture {
 		dr.Value = -1

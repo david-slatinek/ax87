@@ -40,11 +40,11 @@ func main() {
 	//	Value:    2,
 	//})
 
-	//res, err := db.Latest(carbonMonoxide)
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//fmt.Println(res)
+	res, err := db.Latest(soilMoisture)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(res)
 
 	//res, err := db.Last24H(carbonMonoxide)
 	//if err != nil {
@@ -64,9 +64,9 @@ func main() {
 	//}
 	//fmt.Println(res)
 
-	res, err := db.Min(carbonMonoxide)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(res)
+	//res, err := db.Min(carbonMonoxide)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(res)
 }
