@@ -9,12 +9,17 @@ import (
 	"time"
 )
 
-// DB struct for db management.
+// DB is a struct for database management.
 type DB struct {
+	// influxdb2.Client for influxdb communication.
 	client influxdb2.Client
-	url    string
-	token  string
-	org    string
+	// Database connection string.
+	url string
+	// Database token.
+	token string
+	// Database organization name.
+	org string
+	// Database bucket name.
 	bucket string
 }
 
@@ -35,7 +40,7 @@ func (db *DB) Connect() error {
 	return nil
 }
 
-// Init db - recreate bucket.
+// Init db - recreate (delete) bucket.
 func (db *DB) Init() error {
 	ctx := context.Background()
 
@@ -219,6 +224,7 @@ func (db *DB) Last24H(dataType string) (*[]DataResponse, error) {
 	return &data, nil
 }
 
+// RetrieveData returns data for the given query. Only used for Median, Max and Min to prevent code duplication.
 func (db *DB) RetrieveData(query string) (*Data, error) {
 	queryAPI := db.client.QueryAPI(db.org)
 
@@ -249,6 +255,7 @@ func (db *DB) RetrieveData(query string) (*Data, error) {
 	return &dr, nil
 }
 
+// Median returns median data for the last 24 hours for the requested dataType.
 func (db *DB) Median(dataType string) (*Data, error) {
 	return db.RetrieveData(fmt.Sprintf(`from(bucket:"%s")
 			|> range(start: -1d)
@@ -256,6 +263,7 @@ func (db *DB) Median(dataType string) (*Data, error) {
 			|> median(method: "exact_selector")`, db.bucket, dataType))
 }
 
+// Max returns maximum data for the last 24 hours for the requested dataType.
 func (db *DB) Max(dataType string) (*Data, error) {
 	return db.RetrieveData(fmt.Sprintf(`from(bucket:"%s")
 			|> range(start: -1d)
@@ -263,6 +271,7 @@ func (db *DB) Max(dataType string) (*Data, error) {
 			|> max()`, db.bucket, dataType))
 }
 
+// Min returns minimum data for the last 24 hours for the requested dataType.
 func (db *DB) Min(dataType string) (*Data, error) {
 	return db.RetrieveData(fmt.Sprintf(`from(bucket:"%s")
 			|> range(start: -1d)
