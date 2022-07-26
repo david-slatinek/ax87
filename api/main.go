@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 )
@@ -30,10 +31,11 @@ func main() {
 	//}
 
 	//db.Add(&Data{
-	//	DataType: carbonMonoxide,
-	//	Value:    40.78,
+	//	DataType:  carbonMonoxide,
+	//	Value:     55.17,
+	//	TimeStamp: time.Now(),
 	//})
-	//
+
 	//db.Add(&Data{
 	//	DataType: airQuality,
 	//	Value:    120.4,
@@ -49,23 +51,23 @@ func main() {
 	//	Value:    300,
 	//})
 
-	//res, err := db.Latest(soilMoisture)
+	//res, err := db.Latest(carbonMonoxide)
 	//if err != nil {
 	//	fmt.Println(err)
 	//}
 	//fmt.Println(res)
 
-	//res, err := db.Last24H(soilMoisture)
+	//res, err := db.Last24H(carbonMonoxide)
 	//if err != nil {
 	//	fmt.Println(err)
 	//}
 	//fmt.Println(res)
 
-	//res, err := db.Median(soilMoisture)
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//fmt.Println(res)
+	res, err := db.Median(carbonMonoxide)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(res)
 
 	//res, err := db.Max(soilMoisture)
 	//if err != nil {

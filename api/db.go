@@ -99,7 +99,7 @@ func MapValue(x int, inMin int, inMax int, outMin int, outMax int) int {
 // Add new data to db.
 func (db *DB) Add(data *Data) {
 	writeAPI := db.client.WriteAPI(db.org, db.bucket)
-	p := influxdb2.NewPointWithMeasurement(data.DataType).AddField("value", data.Value).SetTime(time.Now())
+	p := influxdb2.NewPointWithMeasurement(data.DataType).AddField("value", data.Value).SetTime(data.TimeStamp)
 
 	switch data.DataType {
 	case carbonMonoxide:
@@ -159,6 +159,7 @@ func (db *DB) Latest(dataType string) (*DataResponse, error) {
 	}
 
 	dr.DataType = result.Record().Measurement()
+	dr.TimeStamp = result.Record().Time()
 
 	return &dr, nil
 }
@@ -177,6 +178,7 @@ func (db *DB) Last24H(dataType string) (*[]DataResponse, error) {
 
 	var categories []int
 	var values []float32
+	var tm []time.Time
 
 	for result.Next() {
 		if result.Record().Field() == "category" {
@@ -193,11 +195,12 @@ func (db *DB) Last24H(dataType string) (*[]DataResponse, error) {
 			} else {
 				values = append(values, -1)
 			}
+			tm = append(tm, result.Record().Time())
 		}
 	}
 
-	if len(categories) != len(values) {
-		return nil, errors.New("the length of categories is different than the length of values")
+	if len(categories) != len(values) || len(categories) != len(tm) {
+		return nil, errors.New("different lengths of categories, values, and timestamps")
 	}
 
 	var data []DataResponse
@@ -205,8 +208,9 @@ func (db *DB) Last24H(dataType string) (*[]DataResponse, error) {
 	for index, value := range categories {
 		data = append(data, DataResponse{
 			Data: Data{
-				DataType: dataType,
-				Value:    values[index],
+				DataType:  dataType,
+				Value:     values[index],
+				TimeStamp: tm[index],
 			},
 			Category: value,
 		})
@@ -224,6 +228,7 @@ func (db *DB) RetrieveData(query string) (float32, error) {
 	}
 
 	for result.Next() {
+		fmt.Println(result.Record().Time())
 		if res, ok := result.Record().Value().(float64); ok {
 			return float32(res), nil
 		}

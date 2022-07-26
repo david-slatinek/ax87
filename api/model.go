@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 const (
 	carbonMonoxide = "carbonMonoxide"
@@ -10,8 +13,9 @@ const (
 )
 
 type Data struct {
-	DataType string
-	Value    float32
+	DataType  string
+	Value     float32
+	TimeStamp time.Time
 }
 
 type DataResponse struct {
@@ -20,7 +24,7 @@ type DataResponse struct {
 }
 
 func (d Data) String() string {
-	return fmt.Sprintf("DataType: %s, Value: %f", d.DataType, d.Value)
+	return fmt.Sprintf("DataType: %s, Value: %f, Time: %v", d.DataType, d.Value, d.TimeStamp)
 }
 
 func (dr DataResponse) String() string {
