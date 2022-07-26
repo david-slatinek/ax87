@@ -7,13 +7,13 @@ import (
 
 const (
 	// Carbon monoxide constant.
-	carbonMonoxide = "carbonMonoxide"
+	carbonMonoxide = "CARBON_MONOXIDE"
 	// Air quality constant.
-	airQuality = "airQuality"
+	airQuality = "AIR_QUALITY"
 	// Raindrops constant.
-	raindrops = "raindrops"
+	raindrops = "RAINDROPS"
 	// Soil moisture constant.
-	soilMoisture = "soilMoisture"
+	soilMoisture = "SOIL_MOISTURE"
 )
 
 // Data is a struct used for serializing data to the database and rarely from the database - only used with functions DB.Median, DB.Max, DB.Min.

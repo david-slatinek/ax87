@@ -1,8 +1,10 @@
 package main
 
 import (
-	"fmt"
+	pb "api/schema"
+	"google.golang.org/grpc"
 	"log"
+	"net"
 	"os"
 )
 
@@ -25,59 +27,16 @@ func main() {
 	}
 	defer db.client.Close()
 
-	//err = db.Init()
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-
-	//db.Add(&Data{
-	//	DataType:  carbonMonoxide,
-	//	Value:     55.17,
-	//	TimeStamp: time.Now(),
-	//})
-
-	//db.Add(&Data{
-	//	DataType: airQuality,
-	//	Value:    120.4,
-	//})
-	//
-	//db.Add(&Data{
-	//	DataType: raindrops,
-	//	Value:    200,
-	//})
-	//
-	//db.Add(&Data{
-	//	DataType: soilMoisture,
-	//	Value:    300,
-	//})
-
-	//res, err := db.Latest(carbonMonoxide)
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//fmt.Println(res)
-
-	//res, err := db.Last24H(carbonMonoxide)
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//fmt.Println(res)
-
-	//res, err := db.Median(carbonMonoxide)
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//fmt.Println(res)
-
-	//res, err := db.Max(carbonMonoxide)
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//fmt.Println(res)
-
-	res, err := db.Min(carbonMonoxide)
+	listener, err := net.Listen("tcp", ":9000")
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalf("Failed to listen on port 9000 with error: %v", err)
 	}
-	fmt.Println(res)
+
+	grpcServer := grpc.NewServer()
+	server := Server{Db: &db}
+	pb.RegisterRequestServer(grpcServer, &server)
+
+	if err := grpcServer.Serve(listener); err != nil {
+		log.Fatalf("Failed to serve, error: %v", err)
+	}
 }

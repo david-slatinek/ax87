@@ -4,9 +4,7 @@ package schema;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "./schema";
-
-// protoc -I=. --go_out=. schema.proto
+option go_package = "./";
 
 enum DataType {
   CARBON_MONOXIDE = 0;
