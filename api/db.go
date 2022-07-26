@@ -219,38 +219,51 @@ func (db *DB) Last24H(dataType string) (*[]DataResponse, error) {
 	return &data, nil
 }
 
-func (db *DB) RetrieveData(query string) (float32, error) {
+func (db *DB) RetrieveData(query string) (*Data, error) {
 	queryAPI := db.client.QueryAPI(db.org)
 
 	result, err := queryAPI.Query(context.Background(), query)
 	if err != nil || result.Err() != nil {
-		return -1, err
+		return nil, err
 	}
+
+	dr := Data{}
+	isData := false
 
 	for result.Next() {
-		fmt.Println(result.Record().Time())
+		isData = true
 		if res, ok := result.Record().Value().(float64); ok {
-			return float32(res), nil
+			dr.Value = float32(res)
+		} else {
+			dr.Value = -1
 		}
 	}
-	return -1, errors.New("the conversion was not successful")
+
+	if !isData {
+		return &dr, errors.New("no data")
+	}
+
+	dr.DataType = result.Record().Measurement()
+	dr.TimeStamp = result.Record().Time()
+
+	return &dr, nil
 }
 
-func (db *DB) Median(dataType string) (float32, error) {
+func (db *DB) Median(dataType string) (*Data, error) {
 	return db.RetrieveData(fmt.Sprintf(`from(bucket:"%s")
 			|> range(start: -1d)
 			|> filter(fn: (r) => r._measurement == "%s" and r._field == "value")
-			|> median()`, db.bucket, dataType))
+			|> median(method: "exact_selector")`, db.bucket, dataType))
 }
 
-func (db *DB) Max(dataType string) (float32, error) {
+func (db *DB) Max(dataType string) (*Data, error) {
 	return db.RetrieveData(fmt.Sprintf(`from(bucket:"%s")
 			|> range(start: -1d)
 			|> filter(fn: (r) => r._measurement == "%s" and r._field == "value")
 			|> max()`, db.bucket, dataType))
 }
 
-func (db *DB) Min(dataType string) (float32, error) {
+func (db *DB) Min(dataType string) (*Data, error) {
 	return db.RetrieveData(fmt.Sprintf(`from(bucket:"%s")
 			|> range(start: -1d)
 			|> filter(fn: (r) => r._measurement == "%s" and r._field == "value")
