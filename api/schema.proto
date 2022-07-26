@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "./main";
+
+enum DataType {
+  CARBON_MONOXIDE = 0;
+  AIR_QUALITY = 1;
+  RAINDROPS = 2;
+  SOIL_MOISTURE = 3;
+}
+
+message Data {
+  DataType data_type = 1;
+  float value = 2;
+  google.protobuf.Timestamp timestamp = 3;
+}
+
+message DataCategory {
+  Data data = 1;
+  int32 category = 2;
+}
+
+message Reply {}
+
+service Request {
+  rpc Add (Data) returns (Reply) {}
+}
