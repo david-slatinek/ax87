@@ -25,6 +25,10 @@ type DB struct {
 
 // Connect to the influxdb server.
 func (db *DB) Connect() error {
+	if db == nil {
+		return errors.New("db can't be nil")
+	}
+
 	db.client = influxdb2.NewClientWithOptions(db.url, db.token,
 		influxdb2.DefaultOptions().SetUseGZip(true))
 
@@ -42,6 +46,10 @@ func (db *DB) Connect() error {
 
 // Init db - recreate (delete) bucket.
 func (db *DB) Init() error {
+	if db == nil {
+		return errors.New("db can't be nil")
+	}
+
 	ctx := context.Background()
 
 	bucket, err := db.client.BucketsAPI().FindBucketByName(ctx, db.bucket)
@@ -103,6 +111,9 @@ func MapValue(x int, inMin int, inMax int, outMin int, outMax int) int {
 
 // Add new data to db.
 func (db *DB) Add(data *Data) {
+	if db == nil || data == nil {
+		return
+	}
 	writeAPI := db.client.WriteAPI(db.org, db.bucket)
 	p := influxdb2.NewPointWithMeasurement(data.DataType).AddField("value", data.Value).SetTime(data.TimeStamp)
 
@@ -125,6 +136,10 @@ func (db *DB) Add(data *Data) {
 
 // Latest returns the latest data for the requested dataType.
 func (db *DB) Latest(dataType string) (*DataResponse, error) {
+	if db == nil {
+		return nil, errors.New("db can't be nil")
+	}
+
 	queryAPI := db.client.QueryAPI(db.org)
 	query := fmt.Sprintf(`from(bucket:"%s")
 			|> range(start: 0)
@@ -171,6 +186,10 @@ func (db *DB) Latest(dataType string) (*DataResponse, error) {
 
 // Last24H returns data for the last 24 hours for the requested dataType.
 func (db *DB) Last24H(dataType string) (*[]DataResponse, error) {
+	if db == nil {
+		return nil, errors.New("db can't be nil")
+	}
+
 	queryAPI := db.client.QueryAPI(db.org)
 	query := fmt.Sprintf(`from(bucket:"%s")
 			|> range(start: -1d)
@@ -226,6 +245,10 @@ func (db *DB) Last24H(dataType string) (*[]DataResponse, error) {
 
 // RetrieveData returns data for the given query. Only used for Median, Max and Min to prevent code duplication.
 func (db *DB) RetrieveData(query string) (*Data, error) {
+	if db == nil {
+		return nil, errors.New("db can't be nil")
+	}
+
 	queryAPI := db.client.QueryAPI(db.org)
 
 	result, err := queryAPI.Query(context.Background(), query)
@@ -257,6 +280,10 @@ func (db *DB) RetrieveData(query string) (*Data, error) {
 
 // Median returns median data for the last 24 hours for the requested dataType.
 func (db *DB) Median(dataType string) (*Data, error) {
+	if db == nil {
+		return nil, errors.New("db can't be nil")
+	}
+
 	return db.RetrieveData(fmt.Sprintf(`from(bucket:"%s")
 			|> range(start: -1d)
 			|> filter(fn: (r) => r._measurement == "%s" and r._field == "value")
@@ -265,6 +292,10 @@ func (db *DB) Median(dataType string) (*Data, error) {
 
 // Max returns maximum data for the last 24 hours for the requested dataType.
 func (db *DB) Max(dataType string) (*Data, error) {
+	if db == nil {
+		return nil, errors.New("db can't be nil")
+	}
+
 	return db.RetrieveData(fmt.Sprintf(`from(bucket:"%s")
 			|> range(start: -1d)
 			|> filter(fn: (r) => r._measurement == "%s" and r._field == "value")
@@ -273,6 +304,10 @@ func (db *DB) Max(dataType string) (*Data, error) {
 
 // Min returns minimum data for the last 24 hours for the requested dataType.
 func (db *DB) Min(dataType string) (*Data, error) {
+	if db == nil {
+		return nil, errors.New("db can't be nil")
+	}
+
 	return db.RetrieveData(fmt.Sprintf(`from(bucket:"%s")
 			|> range(start: -1d)
 			|> filter(fn: (r) => r._measurement == "%s" and r._field == "value")
