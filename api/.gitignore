@@ -2,3 +2,5 @@
 .env
 go.mod
 go.sum
+schema/schema_grpc.pb.go
+schema/schema.pb.go
