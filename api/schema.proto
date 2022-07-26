@@ -1,8 +1,10 @@
 syntax = "proto3";
 
+package schema;
+
 import "google/protobuf/timestamp.proto";
 
-option go_package = "./";
+option go_package = "./schema";
 
 // protoc -I=. --go_out=. schema.proto
 
