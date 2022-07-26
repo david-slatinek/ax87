@@ -2,7 +2,9 @@ syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "./main";
+option go_package = "./";
+
+// protoc -I=. --go_out=. schema.proto
 
 enum DataType {
   CARBON_MONOXIDE = 0;
