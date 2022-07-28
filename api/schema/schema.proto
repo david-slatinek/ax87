@@ -40,4 +40,6 @@ service Request {
   rpc Latest(DataRequest) returns (DataWithCategory) {}
   rpc Last24H(DataRequest) returns (DataRepeated) {}
   rpc Median(DataRequest) returns (Data) {}
+  rpc Max(DataRequest) returns (Data) {}
+  rpc Min(DataRequest) returns (Data) {}
 }

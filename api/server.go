@@ -71,3 +71,29 @@ func (server *Server) Median(_ context.Context, request *pb.DataRequest) (*pb.Da
 
 	return median.Convert(), nil
 }
+
+func (server *Server) Max(_ context.Context, request *pb.DataRequest) (*pb.Data, error) {
+	if request == nil {
+		return nil, errors.New("request can't be nil")
+	}
+
+	max, err := server.dbService.Max(request.GetDataType().String())
+	if err != nil {
+		return nil, err
+	}
+
+	return max.Convert(), nil
+}
+
+func (server *Server) Min(_ context.Context, request *pb.DataRequest) (*pb.Data, error) {
+	if request == nil {
+		return nil, errors.New("request can't be nil")
+	}
+
+	min, err := server.dbService.Min(request.GetDataType().String())
+	if err != nil {
+		return nil, err
+	}
+
+	return min.Convert(), nil
+}
