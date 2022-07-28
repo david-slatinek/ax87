@@ -4,7 +4,6 @@ import (
 	pb "api/schema"
 	"context"
 	"errors"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Server struct {
@@ -27,17 +26,6 @@ func (server *Server) Add(_ context.Context, data *pb.Data) (*pb.EmptyReply, err
 	return &pb.EmptyReply{}, nil
 }
 
-func Convert(t *DataResponse) *pb.DataWithCategory {
-	return &pb.DataWithCategory{
-		Data: &pb.Data{
-			DataType:  pb.DataType(pb.DataType_value[t.DataType]),
-			Value:     t.Value,
-			Timestamp: timestamppb.New(t.TimeStamp),
-		},
-		Category: int32(t.Category),
-	}
-}
-
 func (server *Server) Latest(_ context.Context, request *pb.DataRequest) (*pb.DataWithCategory, error) {
 	if request == nil {
 		return nil, errors.New("request can't be nil")
@@ -49,7 +37,7 @@ func (server *Server) Latest(_ context.Context, request *pb.DataRequest) (*pb.Da
 		return nil, err
 	}
 
-	return Convert(latest), err
+	return latest.Convert(), err
 }
 
 func (server *Server) Last24H(_ context.Context, request *pb.DataRequest) (*pb.DataRepeated, error) {
@@ -65,18 +53,10 @@ func (server *Server) Last24H(_ context.Context, request *pb.DataRequest) (*pb.D
 	var dc []*pb.DataWithCategory
 
 	for _, value := range *last {
-		dc = append(dc, Convert(&value))
+		dc = append(dc, value.Convert())
 	}
 
 	return &pb.DataRepeated{Data: dc}, nil
-}
-
-func ConvertData(data *Data) *pb.Data {
-	return &pb.Data{
-		DataType:  pb.DataType(pb.DataType_value[data.DataType]),
-		Value:     data.Value,
-		Timestamp: timestamppb.New(data.TimeStamp),
-	}
 }
 
 func (server *Server) Median(_ context.Context, request *pb.DataRequest) (*pb.Data, error) {
@@ -89,5 +69,5 @@ func (server *Server) Median(_ context.Context, request *pb.DataRequest) (*pb.Da
 		return nil, err
 	}
 
-	return ConvertData(median), nil
+	return median.Convert(), nil
 }

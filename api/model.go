@@ -1,7 +1,9 @@
 package main
 
 import (
+	pb "api/schema"
 	"fmt"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 )
 
@@ -42,4 +44,23 @@ func (d Data) String() string {
 // String returns DataResponse fields in a string.
 func (dr DataResponse) String() string {
 	return fmt.Sprintf("%v, Category: %d", dr.Data, dr.Category)
+}
+
+func (d *Data) Convert() *pb.Data {
+	return &pb.Data{
+		DataType:  pb.DataType(pb.DataType_value[d.DataType]),
+		Value:     d.Value,
+		Timestamp: timestamppb.New(d.TimeStamp),
+	}
+}
+
+func (dr *DataResponse) Convert() *pb.DataWithCategory {
+	return &pb.DataWithCategory{
+		Data: &pb.Data{
+			DataType:  pb.DataType(pb.DataType_value[dr.DataType]),
+			Value:     dr.Value,
+			Timestamp: timestamppb.New(dr.TimeStamp),
+		},
+		Category: int32(dr.Category),
+	}
 }
