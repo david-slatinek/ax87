@@ -123,8 +123,14 @@ func (db *DB) Add(data *Data) {
 	case airQuality:
 		p.AddField("category", MapAir(int(data.Value)))
 	case raindrops:
+		if int(data.Value) < 0 || int(data.Value) > 1024 {
+			return
+		}
 		p.AddField("category", MapValue(int(data.Value), 0, 1024, 1, 4))
 	case soilMoisture:
+		if int(data.Value) < 238 || int(data.Value) > 489 {
+			return
+		}
 		p.AddField("category", MapValue(int(data.Value), 489, 238, 0, 100))
 	default:
 		return
