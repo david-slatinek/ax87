@@ -39,4 +39,5 @@ service Request {
   rpc Add (Data) returns (EmptyReply) {}
   rpc Latest(DataRequest) returns (DataWithCategory) {}
   rpc Last24H(DataRequest) returns (DataRepeated) {}
+  rpc Median(DataRequest) returns (Data) {}
 }

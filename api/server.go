@@ -58,7 +58,6 @@ func (server *Server) Last24H(_ context.Context, request *pb.DataRequest) (*pb.D
 	}
 
 	last, err := server.dbService.Last24H(request.GetDataType().String())
-
 	if err != nil {
 		return nil, err
 	}
@@ -70,4 +69,25 @@ func (server *Server) Last24H(_ context.Context, request *pb.DataRequest) (*pb.D
 	}
 
 	return &pb.DataRepeated{Data: dc}, nil
+}
+
+func ConvertData(data *Data) *pb.Data {
+	return &pb.Data{
+		DataType:  pb.DataType(pb.DataType_value[data.DataType]),
+		Value:     data.Value,
+		Timestamp: timestamppb.New(data.TimeStamp),
+	}
+}
+
+func (server *Server) Median(_ context.Context, request *pb.DataRequest) (*pb.Data, error) {
+	if request == nil {
+		return nil, errors.New("request can't be nil")
+	}
+
+	median, err := server.dbService.Median(request.GetDataType().String())
+	if err != nil {
+		return nil, err
+	}
+
+	return ConvertData(median), nil
 }
