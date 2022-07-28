@@ -25,6 +25,10 @@ func (server *Server) Add(_ context.Context, data *pb.Data) (*pb.EmptyReply, err
 func (server *Server) Latest(_ context.Context, request *pb.DataRequest) (*pb.DataWithCategory, error) {
 	latest, err := server.dbService.Latest(request.GetDataType().String())
 
+	if err != nil {
+		return nil, err
+	}
+
 	dc := pb.DataWithCategory{
 		Data: &pb.Data{
 			DataType:  pb.DataType(pb.DataType_value[latest.DataType]),
@@ -35,4 +39,28 @@ func (server *Server) Latest(_ context.Context, request *pb.DataRequest) (*pb.Da
 	}
 
 	return &dc, err
+}
+
+func (server *Server) Last24H(_ context.Context, request *pb.DataRequest) (*pb.DataRepeated, error) {
+	last, err := server.dbService.Last24H(request.GetDataType().String())
+
+	if err != nil {
+		return nil, err
+	}
+
+	var dc []*pb.DataWithCategory
+
+	for _, value := range *last {
+		dc = append(dc, &pb.DataWithCategory{
+			Data: &pb.Data{
+				DataType:  pb.DataType(pb.DataType_value[value.DataType]),
+				Value:     value.Value,
+				Timestamp: timestamppb.New(value.TimeStamp),
+			},
+			Category: int32(value.Category),
+		})
+
+	}
+
+	return &pb.DataRepeated{Data: dc}, nil
 }

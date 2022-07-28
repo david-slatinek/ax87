@@ -31,7 +31,12 @@ message DataRequest {
   DataType data_type = 1;
 }
 
+message DataRepeated {
+  repeated DataWithCategory data = 1;
+}
+
 service Request {
   rpc Add (Data) returns (EmptyReply) {}
   rpc Latest(DataRequest) returns (DataWithCategory) {}
+  rpc Last24H(DataRequest) returns (DataRepeated) {}
 }
