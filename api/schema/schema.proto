@@ -24,8 +24,8 @@ message DataCategory {
   int32 category = 2;
 }
 
-message Reply {}
+message EmptyReply {}
 
 service Request {
-  rpc Add (Data) returns (Reply) {}
+  rpc Add (Data) returns (EmptyReply) {}
 }

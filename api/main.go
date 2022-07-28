@@ -33,7 +33,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	server := Server{Db: &db}
+	server := Server{DbService: &db}
 	pb.RegisterRequestServer(grpcServer, &server)
 
 	if err := grpcServer.Serve(listener); err != nil {

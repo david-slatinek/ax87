@@ -7,15 +7,16 @@ import (
 
 type Server struct {
 	pb.UnimplementedRequestServer
-	Db *DB
+	// DB field.
+	DbService *DB
 }
 
-func (s *Server) Add(_ context.Context, data *pb.Data) (*pb.Reply, error) {
+func (server *Server) Add(_ context.Context, data *pb.Data) (*pb.EmptyReply, error) {
 	d := Data{
 		DataType:  data.GetDataType().String(),
 		Value:     data.GetValue(),
 		TimeStamp: data.GetTimestamp().AsTime(),
 	}
-	s.Db.Add(&d)
-	return &pb.Reply{}, nil
+	server.DbService.Add(&d)
+	return &pb.EmptyReply{}, nil
 }
