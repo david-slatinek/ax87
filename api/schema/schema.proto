@@ -7,10 +7,11 @@ import "google/protobuf/timestamp.proto";
 option go_package = "./";
 
 enum DataType {
-  CARBON_MONOXIDE = 0;
-  AIR_QUALITY = 1;
-  RAINDROPS = 2;
-  SOIL_MOISTURE = 3;
+  NONE = 0;
+  CARBON_MONOXIDE = 1;
+  AIR_QUALITY = 2;
+  RAINDROPS = 3;
+  SOIL_MOISTURE = 4;
 }
 
 message Data {
@@ -19,13 +20,18 @@ message Data {
   google.protobuf.Timestamp timestamp = 3;
 }
 
-message DataCategory {
+message DataWithCategory {
   Data data = 1;
   int32 category = 2;
 }
 
 message EmptyReply {}
 
+message DataRequest {
+  DataType data_type = 1;
+}
+
 service Request {
   rpc Add (Data) returns (EmptyReply) {}
+  rpc Latest(DataRequest) returns (DataWithCategory) {}
 }

@@ -41,5 +41,5 @@ func (d Data) String() string {
 
 // String returns DataResponse fields in a string.
 func (dr DataResponse) String() string {
-	return fmt.Sprintf("%s, Category: %d", dr.Data, dr.Category)
+	return fmt.Sprintf("%v, Category: %d", dr.Data, dr.Category)
 }

@@ -157,6 +157,7 @@ func (db *DB) Latest(dataType string) (*DataResponse, error) {
 
 	for result.Next() {
 		isData = true
+
 		if result.Record().Field() == "category" {
 			if res, ok := result.Record().Value().(int64); ok {
 				dr.Category = int(res)
