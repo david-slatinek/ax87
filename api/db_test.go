@@ -6,9 +6,7 @@ import (
 
 // Test DB.LoadFields.
 func TestDB_LoadFields(t *testing.T) {
-	if err := Load("test.env"); err != nil {
-		t.Fatalf("Expected nil with Load, got %v", err)
-	}
+	_ = Load("test.env")
 
 	db := DB{}
 	db.LoadFields()
@@ -32,12 +30,7 @@ func TestDB_LoadFields(t *testing.T) {
 
 // Test DB.Connect.
 func TestDB_Connect(t *testing.T) {
-	if err := Load("test.env"); err != nil {
-		t.Fatalf("Expected nil with Load, got %v", err)
-	}
-	if err := Validate(); err != nil {
-		t.Fatalf("Expected nil with Validate, got %v", err)
-	}
+	_ = Load("test.env")
 
 	db := DB{}
 	db.LoadFields()
@@ -46,9 +39,20 @@ func TestDB_Connect(t *testing.T) {
 		t.Fatalf("Expected nil with Connect, got %v", err)
 	}
 
-	//if err := db.Init(); err != nil {
-	//	t.Fatalf("Expected nil with Init, got %v", err)
-	//}
+	db.client.Close()
+}
+
+// Test DB.Init
+func TestDB_Init(t *testing.T) {
+	_ = Load("test.env")
+
+	db := DB{}
+	db.LoadFields()
+	_ = db.Connect()
+
+	if err := db.Init(); err != nil {
+		t.Fatalf("Expected nil with Init, got %v", err)
+	}
 
 	db.client.Close()
 }
