@@ -6,6 +6,7 @@ import (
 	"fmt"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/domain"
+	"os"
 	"time"
 )
 
@@ -21,6 +22,14 @@ type DB struct {
 	org string
 	// Database bucket name.
 	bucket string
+}
+
+// LoadFields loads DB fields - url, token, org, bucket - from the environment.
+func (db *DB) LoadFields() {
+	db.url = os.Getenv("INFLUXDB_URL")
+	db.token = os.Getenv("INFLUXDB_TOKEN")
+	db.org = os.Getenv("ORGANIZATION")
+	db.bucket = os.Getenv("BUCKET")
 }
 
 // Connect to the influxdb server.

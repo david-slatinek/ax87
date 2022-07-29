@@ -5,7 +5,6 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net"
-	"os"
 )
 
 func main() {
@@ -19,8 +18,9 @@ func main() {
 		log.Fatalf(err.Error())
 	}
 
-	db := DB{url: os.Getenv("INFLUXDB_URL"), token: os.Getenv("INFLUXDB_TOKEN"),
-		org: os.Getenv("ORGANIZATION"), bucket: os.Getenv("BUCKET")}
+	db := DB{}
+	db.LoadFields()
+
 	err = db.Connect()
 	if err != nil {
 		log.Fatalf(err.Error())
