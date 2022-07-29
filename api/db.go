@@ -59,6 +59,10 @@ func (db *DB) Init() error {
 		return errors.New("db can't be nil")
 	}
 
+	if db.client == nil {
+		return errors.New("db.client can't be nil")
+	}
+
 	ctx := context.Background()
 
 	bucket, err := db.client.BucketsAPI().FindBucketByName(ctx, db.bucket)
@@ -120,7 +124,7 @@ func MapValue(x int, inMin int, inMax int, outMin int, outMax int) int {
 
 // Add new data to db.
 func (db *DB) Add(data *Data) {
-	if db == nil || data == nil {
+	if db == nil || data == nil || db.client == nil {
 		return
 	}
 	writeAPI := db.client.WriteAPI(db.org, db.bucket)
@@ -153,6 +157,10 @@ func (db *DB) Add(data *Data) {
 func (db *DB) Latest(dataType string) (*DataResponse, error) {
 	if db == nil {
 		return nil, errors.New("db can't be nil")
+	}
+
+	if db.client == nil {
+		return nil, errors.New("db.client can't be nil")
 	}
 
 	queryAPI := db.client.QueryAPI(db.org)
@@ -204,6 +212,10 @@ func (db *DB) Latest(dataType string) (*DataResponse, error) {
 func (db *DB) Last24H(dataType string) (*[]DataResponse, error) {
 	if db == nil {
 		return nil, errors.New("db can't be nil")
+	}
+
+	if db.client == nil {
+		return nil, errors.New("db.client can't be nil")
 	}
 
 	queryAPI := db.client.QueryAPI(db.org)
@@ -265,6 +277,10 @@ func (db *DB) RetrieveData(query string) (*Data, error) {
 		return nil, errors.New("db can't be nil")
 	}
 
+	if db.client == nil {
+		return nil, errors.New("db.client can't be nil")
+	}
+
 	queryAPI := db.client.QueryAPI(db.org)
 
 	result, err := queryAPI.Query(context.Background(), query)
@@ -300,6 +316,10 @@ func (db *DB) Median(dataType string) (*Data, error) {
 		return nil, errors.New("db can't be nil")
 	}
 
+	if db.client == nil {
+		return nil, errors.New("db.client can't be nil")
+	}
+
 	return db.RetrieveData(fmt.Sprintf(`from(bucket:"%s")
 			|> range(start: -1d)
 			|> filter(fn: (r) => r._measurement == "%s" and r._field == "value")
@@ -312,6 +332,10 @@ func (db *DB) Max(dataType string) (*Data, error) {
 		return nil, errors.New("db can't be nil")
 	}
 
+	if db.client == nil {
+		return nil, errors.New("db.client can't be nil")
+	}
+
 	return db.RetrieveData(fmt.Sprintf(`from(bucket:"%s")
 			|> range(start: -1d)
 			|> filter(fn: (r) => r._measurement == "%s" and r._field == "value")
@@ -322,6 +346,10 @@ func (db *DB) Max(dataType string) (*Data, error) {
 func (db *DB) Min(dataType string) (*Data, error) {
 	if db == nil {
 		return nil, errors.New("db can't be nil")
+	}
+
+	if db.client == nil {
+		return nil, errors.New("db.client can't be nil")
 	}
 
 	return db.RetrieveData(fmt.Sprintf(`from(bucket:"%s")
