@@ -6,6 +6,7 @@ import (
 	"fmt"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/domain"
+	"math"
 	"os"
 	"time"
 )
@@ -118,8 +119,8 @@ func MapAir(value int) int {
 }
 
 // MapValue from one range to another.
-func MapValue(x int, inMin int, inMax int, outMin int, outMax int) int {
-	return (x-inMin)*(outMax-outMin)/(inMax-inMin) + outMin
+func MapValue(x float64, inMin float64, inMax float64, outMin float64, outMax float64) int {
+	return int((math.Round(x-inMin)*(outMax-outMin)/(inMax-inMin) + outMin) + 0.5)
 }
 
 // Add new data to db.
@@ -139,12 +140,12 @@ func (db *DB) Add(data *Data) {
 		if int(data.Value) < 0 || int(data.Value) > 1024 {
 			return
 		}
-		p.AddField("category", MapValue(int(data.Value), 0, 1024, 1, 4))
+		p.AddField("category", MapValue(float64(data.Value), 0, 1024, 1, 4))
 	case soilMoisture:
 		if int(data.Value) < 238 || int(data.Value) > 489 {
 			return
 		}
-		p.AddField("category", MapValue(int(data.Value), 489, 238, 0, 100))
+		p.AddField("category", MapValue(float64(data.Value), 489, 238, 0, 100))
 	default:
 		return
 	}

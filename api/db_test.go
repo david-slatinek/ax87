@@ -120,7 +120,45 @@ func TestMapAir(t *testing.T) {
 	for _, value := range tests {
 		ans := MapAir(value.value)
 		if ans != value.expected {
-			t.Errorf("Expected %d with MapCO2(%d), got %d", value.expected, value.value, ans)
+			t.Errorf("Expected %d with MapAir(%d), got %d", value.expected, value.value, ans)
+		}
+	}
+}
+
+func TestMapValue(t *testing.T) {
+	var tests = []struct {
+		x, inMin, inMax, outMin, outMax float64
+		expected                        int
+	}{
+		{0, 0, 1024, 1, 4, 1},
+		{1024, 0, 1024, 1, 4, 4},
+		{10, 0, 1024, 1, 4, 1},
+		{123, 0, 1024, 1, 4, 1},
+		{270, 0, 1024, 1, 4, 2},
+		{350, 0, 1024, 1, 4, 2},
+		{512, 0, 1024, 1, 4, 3},
+		{645, 0, 1024, 1, 4, 3},
+		{749, 0, 1024, 1, 4, 3},
+		{750, 0, 1024, 1, 4, 3},
+		{751, 0, 1024, 1, 4, 3},
+		{891, 0, 1024, 1, 4, 4},
+		{955, 0, 1024, 1, 4, 4},
+		{1000, 0, 1024, 1, 4, 4},
+		{1015, 0, 1024, 1, 4, 4},
+		{238, 489, 238, 0, 100, 100},
+		{489, 489, 238, 0, 100, 0},
+		{300, 489, 238, 0, 100, 75},
+		{250, 489, 238, 0, 100, 95},
+		{387, 489, 238, 0, 100, 41},
+		{480, 489, 238, 0, 100, 4},
+		{400, 489, 238, 0, 100, 35},
+		{290, 489, 238, 0, 100, 79},
+	}
+
+	for _, value := range tests {
+		ans := MapValue(value.x, value.inMin, value.inMax, value.outMin, value.outMax)
+		if ans != value.expected {
+			t.Errorf("Expected %d with MapValue(%f), got %d", value.expected, value.x, ans)
 		}
 	}
 }
