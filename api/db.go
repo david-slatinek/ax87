@@ -129,7 +129,7 @@ func (db *DB) Add(data *Data) {
 		return
 	}
 	writeAPI := db.client.WriteAPI(db.org, db.bucket)
-	p := influxdb2.NewPointWithMeasurement(data.DataType).AddField("value", data.Value).SetTime(data.TimeStamp)
+	p := influxdb2.NewPointWithMeasurement(data.DataType).AddField("value", data.Value).SetTime(data.TimeStamp.Round(0))
 
 	switch data.DataType {
 	case carbonMonoxide:
@@ -204,7 +204,7 @@ func (db *DB) Latest(dataType string) (*DataResponse, error) {
 	}
 
 	dr.DataType = result.Record().Measurement()
-	dr.TimeStamp = result.Record().Time()
+	dr.TimeStamp = result.Record().Time().Local()
 
 	return &dr, nil
 }

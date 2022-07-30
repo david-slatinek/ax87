@@ -2,6 +2,7 @@ package main
 
 import (
 	"testing"
+	"time"
 )
 
 // Test DB.LoadFields.
@@ -57,6 +58,7 @@ func TestDB_Init(t *testing.T) {
 	db.client.Close()
 }
 
+// Test MapCO2.
 func TestMapCO2(t *testing.T) {
 	var tests = []struct {
 		value, expected int
@@ -95,6 +97,7 @@ func TestMapCO2(t *testing.T) {
 	}
 }
 
+// Test MapAir.
 func TestMapAir(t *testing.T) {
 	var tests = []struct {
 		value, expected int
@@ -125,6 +128,7 @@ func TestMapAir(t *testing.T) {
 	}
 }
 
+// Test MapValue.
 func TestMapValue(t *testing.T) {
 	var tests = []struct {
 		x, inMin, inMax, outMin, outMax float64
@@ -159,6 +163,90 @@ func TestMapValue(t *testing.T) {
 		ans := MapValue(value.x, value.inMin, value.inMax, value.outMin, value.outMax)
 		if ans != value.expected {
 			t.Errorf("Expected %d with MapValue(%f), got %d", value.expected, value.x, ans)
+		}
+	}
+}
+
+// Test DB.Latest.
+func TestDB_Latest(t *testing.T) {
+	_ = Load("test.env")
+
+	db := DB{}
+	db.LoadFields()
+	_ = db.Connect()
+
+	creationTime := time.Now().Round(0)
+
+	var objects = []struct {
+		data     Data
+		expected DataResponse
+	}{
+		{Data{
+			DataType:  carbonMonoxide,
+			Value:     45,
+			TimeStamp: creationTime,
+		}, DataResponse{
+			Data: Data{
+				DataType:  carbonMonoxide,
+				Value:     45,
+				TimeStamp: creationTime,
+			},
+			Category: MapCO2(45),
+		}},
+		{Data{
+			DataType:  airQuality,
+			Value:     125,
+			TimeStamp: creationTime,
+		}, DataResponse{
+			Data: Data{
+				DataType:  airQuality,
+				Value:     125,
+				TimeStamp: creationTime,
+			},
+			Category: MapAir(125),
+		}},
+		{Data{
+			DataType:  raindrops,
+			Value:     800,
+			TimeStamp: creationTime,
+		}, DataResponse{
+			Data: Data{
+				DataType:  raindrops,
+				Value:     800,
+				TimeStamp: creationTime,
+			},
+			Category: MapValue(800, 0, 1024, 1, 4),
+		}},
+		{Data{
+			DataType:  soilMoisture,
+			Value:     400,
+			TimeStamp: creationTime,
+		}, DataResponse{
+			Data: Data{
+				DataType:  soilMoisture,
+				Value:     400,
+				TimeStamp: creationTime,
+			},
+			Category: MapValue(400, 489, 238, 0, 100),
+		}},
+	}
+
+	for _, v := range objects {
+		db.Add(&v.data)
+	}
+
+	types := [4]string{carbonMonoxide, airQuality, raindrops, soilMoisture}
+
+	for k, v := range types {
+		dr, err := db.Latest(v)
+		if err != nil {
+			t.Fatalf("Expected nil with Latest, got %v", err)
+		}
+
+		if !dr.Compare(&objects[k].expected) {
+			t.Error("Object not the same")
+			t.Errorf("Expected: %v", objects[k].expected)
+			t.Errorf("Result: %v\n\n", dr)
 		}
 	}
 }

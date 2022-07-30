@@ -64,3 +64,8 @@ func (dr *DataResponse) Convert() *pb.DataWithCategory {
 		Category: int32(dr.Category),
 	}
 }
+
+// Compare two DataResponse structures. Compares all fields.
+func (dr *DataResponse) Compare(b *DataResponse) bool {
+	return dr.DataType == b.DataType && dr.Value == b.Value && dr.TimeStamp.Equal(b.TimeStamp) && dr.Category == b.Category
+}
