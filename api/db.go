@@ -85,7 +85,7 @@ func (db *DB) Init() error {
 
 // MapCO2 value to 7 categories, with 1 being the best.
 func MapCO2(value int) int {
-	if value < 0 && value <= 30 {
+	if value <= 30 {
 		return 1
 	} else if value > 30 && value <= 70 {
 		return 2
