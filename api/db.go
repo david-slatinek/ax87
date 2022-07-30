@@ -222,7 +222,8 @@ func (db *DB) Last24H(dataType string) (*[]DataResponse, error) {
 	queryAPI := db.client.QueryAPI(db.org)
 	query := fmt.Sprintf(`from(bucket:"%s")
 			|> range(start: -1d)
-			|> filter(fn: (r) => r._measurement == "%s")`, db.bucket, dataType)
+			|> filter(fn: (r) => r._measurement == "%s")
+			|> sort(columns: ["_time"], desc: true)`, db.bucket, dataType)
 
 	result, err := queryAPI.Query(context.Background(), query)
 	if err != nil || result.Err() != nil {
@@ -248,7 +249,7 @@ func (db *DB) Last24H(dataType string) (*[]DataResponse, error) {
 			} else {
 				values = append(values, -1)
 			}
-			tm = append(tm, result.Record().Time())
+			tm = append(tm, result.Record().Time().Local())
 		}
 	}
 
