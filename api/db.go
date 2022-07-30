@@ -307,7 +307,7 @@ func (db *DB) RetrieveData(query string) (*Data, error) {
 	}
 
 	dr.DataType = result.Record().Measurement()
-	dr.TimeStamp = result.Record().Time()
+	dr.TimeStamp = result.Record().Time().Local()
 
 	return &dr, nil
 }

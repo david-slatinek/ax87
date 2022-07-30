@@ -356,3 +356,62 @@ func TestDB_Last24H(t *testing.T) {
 
 	_ = db.Init()
 }
+
+// Test DB.Median.
+func TestDB_Median(t *testing.T) {
+	_ = Load("test.env")
+
+	db := DB{}
+	db.LoadFields()
+	_ = db.Connect()
+	defer db.client.Close()
+
+	_ = db.Init()
+
+	creationTime := time.Now().Round(0)
+
+	var objects = [5]Data{
+		{
+			DataType:  airQuality,
+			Value:     140,
+			TimeStamp: creationTime.Add(time.Minute * -2),
+		},
+		{
+			DataType:  airQuality,
+			Value:     205,
+			TimeStamp: creationTime.Add(time.Second * -2),
+		},
+		{
+			DataType:  airQuality,
+			Value:     270,
+			TimeStamp: creationTime.Add(time.Second * -5),
+		},
+		{
+			DataType:  airQuality,
+			Value:     33,
+			TimeStamp: creationTime.Add(time.Second * -21),
+		},
+		{
+			DataType:  airQuality,
+			Value:     195,
+			TimeStamp: creationTime.Add(time.Minute * -1),
+		},
+	}
+
+	for _, v := range objects {
+		db.Add(&v)
+	}
+
+	dr, err := db.Median(airQuality)
+	if err != nil {
+		t.Fatalf("Expected nil with Median, got %v", err)
+	}
+
+	if !dr.Compare(&objects[4]) {
+		t.Error("Objects not the same")
+		t.Errorf("Expected: %v", objects[4])
+		t.Errorf("Result: %v", dr)
+	}
+
+	_ = db.Init()
+}

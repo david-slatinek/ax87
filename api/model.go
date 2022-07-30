@@ -69,3 +69,7 @@ func (dr *DataResponse) Convert() *pb.DataWithCategory {
 func (dr *DataResponse) Compare(b *DataResponse) bool {
 	return dr.DataType == b.DataType && dr.Value == b.Value && dr.TimeStamp.Equal(b.TimeStamp) && dr.Category == b.Category
 }
+
+func (d *Data) Compare(b *Data) bool {
+	return d.DataType == b.DataType && d.Value == b.Value && d.TimeStamp.Equal(b.TimeStamp)
+}
