@@ -402,15 +402,24 @@ func TestDB_Median(t *testing.T) {
 		db.Add(&v)
 	}
 
-	dr, err := db.Median(airQuality)
+	d, err := db.Median(airQuality)
 	if err != nil {
 		t.Fatalf("Expected nil with Median, got %v", err)
 	}
 
-	if !dr.Compare(&objects[4]) {
+	dr := DataResponse{
+		Data: Data{
+			DataType:  airQuality,
+			Value:     195,
+			TimeStamp: creationTime.Add(time.Minute * -1),
+		},
+		Category: MapAir(195),
+	}
+
+	if !d.Compare(&dr) {
 		t.Error("Objects not the same")
-		t.Errorf("Expected: %v", objects[4])
-		t.Errorf("Result: %v", dr)
+		t.Errorf("Expected: %v", dr)
+		t.Errorf("Result: %v", d)
 	}
 
 	_ = db.Init()

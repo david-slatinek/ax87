@@ -274,7 +274,7 @@ func (db *DB) Last24H(dataType string) (*[]DataResponse, error) {
 }
 
 // RetrieveData returns data for the given query. Only used for Median, Max and Min to prevent code duplication.
-func (db *DB) RetrieveData(query string) (*Data, error) {
+func (db *DB) RetrieveData(query, dataType string) (*DataResponse, error) {
 	if db == nil {
 		return nil, errors.New("db can't be nil")
 	}
@@ -290,7 +290,7 @@ func (db *DB) RetrieveData(query string) (*Data, error) {
 		return nil, err
 	}
 
-	dr := Data{}
+	dr := DataResponse{}
 	isData := false
 
 	for result.Next() {
@@ -309,11 +309,22 @@ func (db *DB) RetrieveData(query string) (*Data, error) {
 	dr.DataType = result.Record().Measurement()
 	dr.TimeStamp = result.Record().Time().Local()
 
+	switch dataType {
+	case carbonMonoxide:
+		dr.Category = MapCO2(int(dr.Value))
+	case airQuality:
+		dr.Category = MapAir(int(dr.Value))
+	case raindrops:
+		dr.Category = MapValue(float64(dr.Value), 0, 1024, 1, 4)
+	case soilMoisture:
+		dr.Category = MapValue(float64(dr.Value), 489, 238, 0, 100)
+	}
+
 	return &dr, nil
 }
 
 // Median returns median data for the last 24 hours for the requested dataType.
-func (db *DB) Median(dataType string) (*Data, error) {
+func (db *DB) Median(dataType string) (*DataResponse, error) {
 	if db == nil {
 		return nil, errors.New("db can't be nil")
 	}
@@ -325,11 +336,11 @@ func (db *DB) Median(dataType string) (*Data, error) {
 	return db.RetrieveData(fmt.Sprintf(`from(bucket:"%s")
 			|> range(start: -1d)
 			|> filter(fn: (r) => r._measurement == "%s" and r._field == "value")
-			|> median(method: "exact_selector")`, db.bucket, dataType))
+			|> median(method: "exact_selector")`, db.bucket, dataType), dataType)
 }
 
 // Max returns maximum data for the last 24 hours for the requested dataType.
-func (db *DB) Max(dataType string) (*Data, error) {
+func (db *DB) Max(dataType string) (*DataResponse, error) {
 	if db == nil {
 		return nil, errors.New("db can't be nil")
 	}
@@ -341,11 +352,11 @@ func (db *DB) Max(dataType string) (*Data, error) {
 	return db.RetrieveData(fmt.Sprintf(`from(bucket:"%s")
 			|> range(start: -1d)
 			|> filter(fn: (r) => r._measurement == "%s" and r._field == "value")
-			|> max()`, db.bucket, dataType))
+			|> max()`, db.bucket, dataType), dataType)
 }
 
 // Min returns minimum data for the last 24 hours for the requested dataType.
-func (db *DB) Min(dataType string) (*Data, error) {
+func (db *DB) Min(dataType string) (*DataResponse, error) {
 	if db == nil {
 		return nil, errors.New("db can't be nil")
 	}
@@ -357,5 +368,5 @@ func (db *DB) Min(dataType string) (*Data, error) {
 	return db.RetrieveData(fmt.Sprintf(`from(bucket:"%s")
 			|> range(start: -1d)
 			|> filter(fn: (r) => r._measurement == "%s" and r._field == "value")
-			|> min()`, db.bucket, dataType))
+			|> min()`, db.bucket, dataType), dataType)
 }
