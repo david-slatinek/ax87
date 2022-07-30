@@ -103,7 +103,7 @@ func MapCO2(value int) int {
 
 // MapAir quality value to 6 categories, with 1 being the best.
 func MapAir(value int) int {
-	if value < 0 && value <= 50 {
+	if value <= 50 {
 		return 1
 	} else if value > 50 && value <= 100 {
 		return 2

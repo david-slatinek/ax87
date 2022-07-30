@@ -94,3 +94,33 @@ func TestMapCO2(t *testing.T) {
 		}
 	}
 }
+
+func TestMapAir(t *testing.T) {
+	var tests = []struct {
+		value, expected int
+	}{
+		{-10, 1},
+		{0, 1},
+		{17, 1},
+		{30, 1},
+		{50, 1},
+		{69, 2},
+		{85, 2},
+		{100, 2},
+		{120, 3},
+		{150, 3},
+		{188, 4},
+		{200, 4},
+		{217, 5},
+		{300, 5},
+		{361, 6},
+		{400, 6},
+	}
+
+	for _, value := range tests {
+		ans := MapAir(value.value)
+		if ans != value.expected {
+			t.Errorf("Expected %d with MapCO2(%d), got %d", value.expected, value.value, ans)
+		}
+	}
+}
