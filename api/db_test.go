@@ -245,13 +245,11 @@ func TestDB_Latest(t *testing.T) {
 		}
 
 		if !dr.Compare(&objects[k].expected) {
-			t.Error("Objects not the same")
+			t.Error("Objects are not the same")
 			t.Errorf("Expected: %v", objects[k].expected)
 			t.Errorf("Result: %v", dr)
 		}
 	}
-
-	_ = db.Init()
 }
 
 // Test DB.Last24H.
@@ -348,13 +346,11 @@ func TestDB_Last24H(t *testing.T) {
 
 	for k, v := range *dr {
 		if !v.Compare(&objects[k].expected) {
-			t.Error("Objects not the same")
+			t.Error("Objects are not the same")
 			t.Errorf("Expected: %v", objects[k].expected)
 			t.Errorf("Result: %v", v)
 		}
 	}
-
-	_ = db.Init()
 }
 
 // Test DB.Median.
@@ -417,12 +413,10 @@ func TestDB_Median(t *testing.T) {
 	}
 
 	if !d.Compare(&dr) {
-		t.Error("Objects not the same")
+		t.Error("Objects are not the same")
 		t.Errorf("Expected: %v", dr)
 		t.Errorf("Result: %v", d)
 	}
-
-	_ = db.Init()
 }
 
 // Test DB.Max.
@@ -485,12 +479,10 @@ func TestDB_Max(t *testing.T) {
 	}
 
 	if !d.Compare(&dr) {
-		t.Error("Objects not the same")
+		t.Error("Objects are not the same")
 		t.Errorf("Expected: %v", dr)
 		t.Errorf("Result: %v", d)
 	}
-
-	_ = db.Init()
 }
 
 // Test DB.Min.
@@ -553,10 +545,8 @@ func TestDB_Min(t *testing.T) {
 	}
 
 	if !d.Compare(&dr) {
-		t.Error("Objects not the same")
+		t.Error("Objects are not the same")
 		t.Errorf("Expected: %v", dr)
 		t.Errorf("Result: %v", d)
 	}
-
-	_ = db.Init()
 }

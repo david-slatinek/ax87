@@ -75,17 +75,23 @@ func (dr *DataResponse) Convert() *pb.DataWithCategory {
 	}
 }
 
-// Compare two DataResponse structures. Compares all fields.
+// Compare two DataResponse structures.
 func (dr *DataResponse) Compare(b *DataResponse) bool {
 	return dr.DataType == b.DataType && dr.Value == b.Value && dr.TimeStamp.Equal(b.TimeStamp) && dr.Category == b.Category
 }
 
+// Compare two Data structures.
 func (d *Data) Compare(b *Data) bool {
 	return d.DataType == b.DataType && d.Value == b.Value && d.TimeStamp.Equal(b.TimeStamp)
 }
 
-// Equals compares two pb.DataWithCategory structures. Compares all fields.
-func Equals(a, b *pb.DataWithCategory) bool {
+// EqualsData compares two pb.DataWithCategory structures. Checks only pb.Data field.
+func EqualsData(a, b *pb.DataWithCategory) bool {
 	return a.Data.DataType == b.Data.DataType && a.Data.Value == b.Data.Value &&
-		a.Data.Timestamp.AsTime().Equal(b.Data.Timestamp.AsTime()) && a.Category == b.Category
+		a.Data.Timestamp.AsTime().Equal(b.Data.Timestamp.AsTime())
+}
+
+// Equals compares two pb.DataWithCategory structures.
+func Equals(a, b *pb.DataWithCategory) bool {
+	return EqualsData(a, b) && a.Category == b.Category
 }
