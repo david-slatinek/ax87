@@ -424,3 +424,71 @@ func TestDB_Median(t *testing.T) {
 
 	_ = db.Init()
 }
+
+// Test DB.Max.
+func TestDB_Max(t *testing.T) {
+	_ = Load("test.env")
+
+	db := DB{}
+	db.LoadFields()
+	_ = db.Connect()
+	defer db.client.Close()
+
+	_ = db.Init()
+
+	creationTime := time.Now().Round(0)
+
+	var objects = [5]Data{
+		{
+			DataType:  raindrops,
+			Value:     230,
+			TimeStamp: creationTime.Add(time.Minute * -1),
+		},
+		{
+			DataType:  raindrops,
+			Value:     420,
+			TimeStamp: creationTime.Add(time.Second * -3),
+		},
+		{
+			DataType:  raindrops,
+			Value:     114,
+			TimeStamp: creationTime.Add(time.Second * -7),
+		},
+		{
+			DataType:  raindrops,
+			Value:     47,
+			TimeStamp: creationTime.Add(time.Second * -41),
+		},
+		{
+			DataType:  raindrops,
+			Value:     842,
+			TimeStamp: creationTime.Add(time.Minute * -2),
+		},
+	}
+
+	for _, v := range objects {
+		db.Add(&v)
+	}
+
+	d, err := db.Max(raindrops)
+	if err != nil {
+		t.Fatalf("Expected nil with Max, got %v", err)
+	}
+
+	dr := DataResponse{
+		Data: Data{
+			DataType:  raindrops,
+			Value:     842,
+			TimeStamp: creationTime.Add(time.Minute * -2),
+		},
+		Category: MapValue(842, 0, 1024, 1, 4),
+	}
+
+	if !d.Compare(&dr) {
+		t.Error("Objects not the same")
+		t.Errorf("Expected: %v", dr)
+		t.Errorf("Result: %v", d)
+	}
+
+	_ = db.Init()
+}
