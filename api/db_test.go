@@ -492,3 +492,71 @@ func TestDB_Max(t *testing.T) {
 
 	_ = db.Init()
 }
+
+// Test DB.Min.
+func TestDB_Min(t *testing.T) {
+	_ = Load("test.env")
+
+	db := DB{}
+	db.LoadFields()
+	_ = db.Connect()
+	defer db.client.Close()
+
+	_ = db.Init()
+
+	creationTime := time.Now().Round(0)
+
+	var objects = [5]Data{
+		{
+			DataType:  soilMoisture,
+			Value:     250,
+			TimeStamp: creationTime.Add(time.Second * -10),
+		},
+		{
+			DataType:  soilMoisture,
+			Value:     307,
+			TimeStamp: creationTime.Add(time.Second * -17),
+		},
+		{
+			DataType:  soilMoisture,
+			Value:     348,
+			TimeStamp: creationTime.Add(time.Second * -2),
+		},
+		{
+			DataType:  soilMoisture,
+			Value:     412,
+			TimeStamp: creationTime.Add(time.Minute * -5),
+		},
+		{
+			DataType:  soilMoisture,
+			Value:     440,
+			TimeStamp: creationTime.Add(time.Minute * -1),
+		},
+	}
+
+	for _, v := range objects {
+		db.Add(&v)
+	}
+
+	d, err := db.Min(soilMoisture)
+	if err != nil {
+		t.Fatalf("Expected nil with Min, got %v", err)
+	}
+
+	dr := DataResponse{
+		Data: Data{
+			DataType:  soilMoisture,
+			Value:     250,
+			TimeStamp: creationTime.Add(time.Second * -10),
+		},
+		Category: MapValue(250, 489, 238, 0, 100),
+	}
+
+	if !d.Compare(&dr) {
+		t.Error("Objects not the same")
+		t.Errorf("Expected: %v", dr)
+		t.Errorf("Result: %v", d)
+	}
+
+	_ = db.Init()
+}
