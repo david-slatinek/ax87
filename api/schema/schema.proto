@@ -25,7 +25,7 @@ message DataWithCategory {
   int32 category = 2;
 }
 
-message EmptyReply {}
+message Reply {}
 
 message DataRequest {
   DataType data_type = 1;
@@ -36,10 +36,10 @@ message DataRepeated {
 }
 
 service Request {
-  rpc Add (Data) returns (EmptyReply) {}
+  rpc Add (Data) returns (Reply) {}
   rpc Latest(DataRequest) returns (DataWithCategory) {}
   rpc Last24H(DataRequest) returns (DataRepeated) {}
-  rpc Median(DataRequest) returns (Data) {}
-  rpc Max(DataRequest) returns (Data) {}
-  rpc Min(DataRequest) returns (Data) {}
+  rpc Median(DataRequest) returns (DataWithCategory) {}
+  rpc Max(DataRequest) returns (DataWithCategory) {}
+  rpc Min(DataRequest) returns (DataWithCategory) {}
 }

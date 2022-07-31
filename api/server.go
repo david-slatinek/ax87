@@ -12,9 +12,9 @@ type Server struct {
 	dbService *DB
 }
 
-func (server *Server) Add(_ context.Context, data *pb.Data) (*pb.EmptyReply, error) {
+func (server *Server) Add(_ context.Context, data *pb.Data) (*pb.Reply, error) {
 	if data == nil {
-		return &pb.EmptyReply{}, errors.New("data can't be nil")
+		return &pb.Reply{}, errors.New("data can't be nil")
 	}
 
 	d := Data{
@@ -23,7 +23,7 @@ func (server *Server) Add(_ context.Context, data *pb.Data) (*pb.EmptyReply, err
 		TimeStamp: data.GetTimestamp().AsTime(),
 	}
 	server.dbService.Add(&d)
-	return &pb.EmptyReply{}, nil
+	return &pb.Reply{}, nil
 }
 
 func (server *Server) Latest(_ context.Context, request *pb.DataRequest) (*pb.DataWithCategory, error) {
@@ -59,7 +59,7 @@ func (server *Server) Last24H(_ context.Context, request *pb.DataRequest) (*pb.D
 	return &pb.DataRepeated{Data: dc}, nil
 }
 
-func (server *Server) Median(_ context.Context, request *pb.DataRequest) (*pb.Data, error) {
+func (server *Server) Median(_ context.Context, request *pb.DataRequest) (*pb.DataWithCategory, error) {
 	if request == nil {
 		return nil, errors.New("request can't be nil")
 	}
@@ -72,7 +72,7 @@ func (server *Server) Median(_ context.Context, request *pb.DataRequest) (*pb.Da
 	return median.Convert(), nil
 }
 
-func (server *Server) Max(_ context.Context, request *pb.DataRequest) (*pb.Data, error) {
+func (server *Server) Max(_ context.Context, request *pb.DataRequest) (*pb.DataWithCategory, error) {
 	if request == nil {
 		return nil, errors.New("request can't be nil")
 	}
@@ -85,7 +85,7 @@ func (server *Server) Max(_ context.Context, request *pb.DataRequest) (*pb.Data,
 	return max.Convert(), nil
 }
 
-func (server *Server) Min(_ context.Context, request *pb.DataRequest) (*pb.Data, error) {
+func (server *Server) Min(_ context.Context, request *pb.DataRequest) (*pb.DataWithCategory, error) {
 	if request == nil {
 		return nil, errors.New("request can't be nil")
 	}
