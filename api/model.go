@@ -46,6 +46,7 @@ func (dr DataResponse) String() string {
 	return fmt.Sprintf("%v, Category: %d", dr.Data, dr.Category)
 }
 
+// Convert Data to pb.Data.
 func (d *Data) Convert() *pb.Data {
 	return &pb.Data{
 		DataType:  pb.DataType(pb.DataType_value[d.DataType]),
@@ -54,6 +55,15 @@ func (d *Data) Convert() *pb.Data {
 	}
 }
 
+// ConvertToDC converts Data to pb.DataWithCategory.
+func (d *Data) ConvertToDC() *pb.DataWithCategory {
+	return &pb.DataWithCategory{
+		Data:     d.Convert(),
+		Category: int32(GetCategory(int(d.Value), d.DataType)),
+	}
+}
+
+// Convert DataResponse to pb.DataWithCategory.
 func (dr *DataResponse) Convert() *pb.DataWithCategory {
 	return &pb.DataWithCategory{
 		Data: &pb.Data{
@@ -72,4 +82,10 @@ func (dr *DataResponse) Compare(b *DataResponse) bool {
 
 func (d *Data) Compare(b *Data) bool {
 	return d.DataType == b.DataType && d.Value == b.Value && d.TimeStamp.Equal(b.TimeStamp)
+}
+
+// Equals compares two pb.DataWithCategory structures. Compares all fields.
+func Equals(a, b *pb.DataWithCategory) bool {
+	return a.Data.DataType == b.Data.DataType && a.Data.Value == b.Data.Value &&
+		a.Data.Timestamp.AsTime().Equal(b.Data.Timestamp.AsTime()) && a.Category == b.Category
 }

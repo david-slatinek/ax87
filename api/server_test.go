@@ -40,6 +40,38 @@ func TestServer_Add(t *testing.T) {
 		t.Errorf("Result: %v", reply)
 		t.FailNow()
 	}
+}
+
+func TestServer_Latest(t *testing.T) {
+	_ = Load("test.env")
+
+	db := DB{}
+	db.LoadFields()
+	_ = db.Connect()
+	defer db.client.Close()
 
 	_ = db.Init()
+
+	data := Data{
+		DataType:  airQuality,
+		Value:     183,
+		TimeStamp: time.Now().Round(0),
+	}
+	db.Add(&data)
+
+	server := Server{dbService: &db}
+	dc, err := server.Latest(context.Background(), &pb.DataRequest{DataType: pb.DataType_AIR_QUALITY})
+
+	if err != nil {
+		t.Fatalf("Expected nil with Server.Latest, got %v", err)
+	}
+
+	expected := data.ConvertToDC()
+
+	if !Equals(dc, expected) {
+		t.Error("Objects are not the same")
+		t.Errorf("Expected: %v", expected)
+		t.Errorf("Result: %v", &dc)
+		t.FailNow()
+	}
 }

@@ -123,6 +123,21 @@ func MapValue(x float64, inMin float64, inMax float64, outMin float64, outMax fl
 	return int((math.Round(x-inMin)*(outMax-outMin)/(inMax-inMin) + outMin) + 0.5)
 }
 
+// GetCategory gets category for specific dataType.
+func GetCategory(value int, dataType string) int {
+	switch dataType {
+	case carbonMonoxide:
+		return MapCO2(value)
+	case airQuality:
+		return MapAir(value)
+	case raindrops:
+		return MapValue(float64(value), 0, 1024, 1, 4)
+	case soilMoisture:
+		return MapValue(float64(value), 489, 238, 0, 100)
+	}
+	return -1
+}
+
 // Add new data to db.
 func (db *DB) Add(data *Data) {
 	if db == nil || data == nil || db.client == nil {
@@ -132,23 +147,17 @@ func (db *DB) Add(data *Data) {
 	p := influxdb2.NewPointWithMeasurement(data.DataType).AddField("value", data.Value).SetTime(data.TimeStamp.Round(0))
 
 	switch data.DataType {
-	case carbonMonoxide:
-		p.AddField("category", MapCO2(int(data.Value)))
-	case airQuality:
-		p.AddField("category", MapAir(int(data.Value)))
 	case raindrops:
 		if int(data.Value) < 0 || int(data.Value) > 1024 {
 			return
 		}
-		p.AddField("category", MapValue(float64(data.Value), 0, 1024, 1, 4))
 	case soilMoisture:
 		if int(data.Value) < 238 || int(data.Value) > 489 {
 			return
 		}
-		p.AddField("category", MapValue(float64(data.Value), 489, 238, 0, 100))
-	default:
-		return
 	}
+
+	p.AddField("category", GetCategory(int(data.Value), data.DataType))
 
 	writeAPI.WritePoint(p)
 	writeAPI.Flush()
