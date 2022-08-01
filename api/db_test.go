@@ -35,11 +35,11 @@ func TestDB_Connect(t *testing.T) {
 
 	db := DB{}
 	db.LoadFields()
-	defer db.client.Close()
 
 	if err := db.Connect(); err != nil {
 		t.Fatalf("Expected nil with Connect, got %v", err)
 	}
+	defer db.client.Close()
 }
 
 // Test DB.Init
