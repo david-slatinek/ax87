@@ -162,8 +162,8 @@ func TestServer_Last24H(t *testing.T) {
 	}
 
 	server := Server{dbService: &db}
-	dr, err := server.Last24H(context.Background(), &pb.DataRequest{DataType: pb.DataType_RAINDROPS})
 
+	dr, err := server.Last24H(context.Background(), &pb.DataRequest{DataType: pb.DataType_RAINDROPS})
 	if err != nil {
 		t.Fatalf("Expected nil with Last24H, got %v", err)
 	}
@@ -178,5 +178,72 @@ func TestServer_Last24H(t *testing.T) {
 			t.Errorf("Expected: %v", &v.expected)
 			t.Errorf("Result: %v", dr.Data[k])
 		}
+	}
+}
+
+func TestServer_Median(t *testing.T) {
+	_ = Load("test.env")
+
+	db := DB{}
+	db.LoadFields()
+	_ = db.Connect()
+	defer db.client.Close()
+
+	_ = db.Init()
+
+	creationTime := time.Now().Round(0)
+
+	var objects = [5]Data{
+		{
+			DataType:  soilMoisture,
+			Value:     222,
+			TimeStamp: creationTime.Add(time.Minute * -3),
+		},
+		{
+			DataType:  soilMoisture,
+			Value:     312,
+			TimeStamp: creationTime.Add(time.Second * -4),
+		},
+		{
+			DataType:  soilMoisture,
+			Value:     294,
+			TimeStamp: creationTime.Add(time.Second * -5),
+		},
+		{
+			DataType:  soilMoisture,
+			Value:     431,
+			TimeStamp: creationTime.Add(time.Hour * -17),
+		},
+		{
+			DataType:  soilMoisture,
+			Value:     401,
+			TimeStamp: creationTime.Add(time.Hour * -1),
+		},
+	}
+
+	for _, v := range objects {
+		db.Add(&v)
+	}
+
+	server := Server{dbService: &db}
+
+	dc, err := server.Median(context.Background(), &pb.DataRequest{DataType: pb.DataType_SOIL_MOISTURE})
+	if err != nil {
+		t.Fatalf("Expected nil with Median, got %v", err)
+	}
+
+	dr := pb.DataWithCategory{
+		Data: &pb.Data{
+			DataType:  pb.DataType_SOIL_MOISTURE,
+			Value:     312,
+			Timestamp: timestamppb.New(creationTime.Add(time.Second * -4)),
+		},
+		Category: int32(GetCategory(312, soilMoisture)),
+	}
+
+	if !Equals(dc, &dr) {
+		t.Error("Objects are not the same")
+		t.Errorf("Expected: %v", &dr)
+		t.Errorf("Result: %v", dc)
 	}
 }
