@@ -2,9 +2,12 @@ package main
 
 import (
 	pb "api/schema"
+	"context"
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"os"
+	"os/signal"
 )
 
 func main() {
@@ -35,6 +38,17 @@ func main() {
 	grpcServer := grpc.NewServer()
 	server := Server{dbService: &db}
 	pb.RegisterRequestServer(grpcServer, &server)
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		<-c
+		_, cancel := context.WithTimeout(context.Background(), 15)
+		defer cancel()
+		grpcServer.GracefulStop()
+		log.Println("Server is shutting down...")
+		os.Exit(0)
+	}()
 
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("Failed to serve, error: %v", err)
