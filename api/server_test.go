@@ -247,3 +247,71 @@ func TestServer_Median(t *testing.T) {
 		t.Errorf("Result: %v", dc)
 	}
 }
+
+// Test Server.Max.
+func TestServer_Max(t *testing.T) {
+	_ = Load("test.env")
+
+	db := DB{}
+	db.LoadFields()
+	_ = db.Connect()
+	defer db.client.Close()
+
+	_ = db.Init()
+
+	creationTime := time.Now().Round(0)
+
+	var objects = [5]Data{
+		{
+			DataType:  carbonMonoxide,
+			Value:     65,
+			TimeStamp: creationTime.Add(time.Minute * -2),
+		},
+		{
+			DataType:  carbonMonoxide,
+			Value:     741,
+			TimeStamp: creationTime.Add(time.Second * -45),
+		},
+		{
+			DataType:  carbonMonoxide,
+			Value:     132,
+			TimeStamp: creationTime.Add(time.Minute * -22),
+		},
+		{
+			DataType:  carbonMonoxide,
+			Value:     387,
+			TimeStamp: creationTime.Add(time.Hour * -3),
+		},
+		{
+			DataType:  carbonMonoxide,
+			Value:     25,
+			TimeStamp: creationTime.Add(time.Minute * -37),
+		},
+	}
+
+	for _, v := range objects {
+		db.Add(&v)
+	}
+
+	server := Server{dbService: &db}
+
+	dc, err := server.Max(context.Background(), &pb.DataRequest{DataType: pb.DataType_CARBON_MONOXIDE})
+	if err != nil {
+		t.Fatalf("Expected nil with Max, got %v", err)
+	}
+
+	dr := pb.DataWithCategory{
+		Data: &pb.Data{
+			DataType:  pb.DataType_CARBON_MONOXIDE,
+			Value:     741,
+			Timestamp: timestamppb.New(creationTime.Add(time.Second * -45)),
+		},
+		Category: int32(GetCategory(741, carbonMonoxide)),
+	}
+
+	if !Equals(dc, &dr) {
+		t.Error("Objects are not the same")
+		t.Errorf("Expected: %v", &dr)
+		t.Errorf("Result: %v", dc)
+	}
+}
