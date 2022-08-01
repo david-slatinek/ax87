@@ -315,3 +315,71 @@ func TestServer_Max(t *testing.T) {
 		t.Errorf("Result: %v", dc)
 	}
 }
+
+// Test Server.Min.
+func TestServer_Min(t *testing.T) {
+	_ = Load("test.env")
+
+	db := DB{}
+	db.LoadFields()
+	_ = db.Connect()
+	defer db.client.Close()
+
+	_ = db.Init()
+
+	creationTime := time.Now().Round(0)
+
+	var objects = [5]Data{
+		{
+			DataType:  airQuality,
+			Value:     33,
+			TimeStamp: creationTime.Add(time.Second * -2),
+		},
+		{
+			DataType:  airQuality,
+			Value:     331,
+			TimeStamp: creationTime.Add(time.Hour * -4),
+		},
+		{
+			DataType:  airQuality,
+			Value:     363,
+			TimeStamp: creationTime.Add(time.Minute * -35),
+		},
+		{
+			DataType:  airQuality,
+			Value:     182,
+			TimeStamp: creationTime.Add(time.Hour * -7),
+		},
+		{
+			DataType:  airQuality,
+			Value:     167,
+			TimeStamp: creationTime.Add(time.Second * -37),
+		},
+	}
+
+	for _, v := range objects {
+		db.Add(&v)
+	}
+
+	server := Server{dbService: &db}
+
+	dc, err := server.Min(context.Background(), &pb.DataRequest{DataType: pb.DataType_AIR_QUALITY})
+	if err != nil {
+		t.Fatalf("Expected nil with Min, got %v", err)
+	}
+
+	dr := pb.DataWithCategory{
+		Data: &pb.Data{
+			DataType:  pb.DataType_AIR_QUALITY,
+			Value:     33,
+			Timestamp: timestamppb.New(creationTime.Add(time.Second * -2)),
+		},
+		Category: int32(GetCategory(33, airQuality)),
+	}
+
+	if !Equals(dc, &dr) {
+		t.Error("Objects are not the same")
+		t.Errorf("Expected: %v", &dr)
+		t.Errorf("Result: %v", dc)
+	}
+}
