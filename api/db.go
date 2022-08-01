@@ -138,7 +138,7 @@ func GetCategory(value int, dataType string) int {
 	return -1
 }
 
-// Add new data to db.
+// Add new data to the db.
 func (db *DB) Add(data *Data) {
 	if db == nil || data == nil || db.client == nil {
 		return

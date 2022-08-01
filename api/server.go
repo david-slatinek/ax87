@@ -12,6 +12,7 @@ type Server struct {
 	dbService *DB
 }
 
+// Add new data to the db.
 func (server *Server) Add(_ context.Context, data *pb.Data) (*pb.Reply, error) {
 	if data == nil {
 		return &pb.Reply{}, errors.New("data can't be nil")
@@ -26,6 +27,7 @@ func (server *Server) Add(_ context.Context, data *pb.Data) (*pb.Reply, error) {
 	return &pb.Reply{}, nil
 }
 
+// Latest returns the latest data for the requested dataType.
 func (server *Server) Latest(_ context.Context, request *pb.DataRequest) (*pb.DataWithCategory, error) {
 	if request == nil {
 		return nil, errors.New("request can't be nil")
@@ -40,6 +42,7 @@ func (server *Server) Latest(_ context.Context, request *pb.DataRequest) (*pb.Da
 	return latest.Convert(), err
 }
 
+// Last24H returns data for the last 24 hours for the requested dataType.
 func (server *Server) Last24H(_ context.Context, request *pb.DataRequest) (*pb.DataRepeated, error) {
 	if request == nil {
 		return nil, errors.New("request can't be nil")
@@ -59,6 +62,7 @@ func (server *Server) Last24H(_ context.Context, request *pb.DataRequest) (*pb.D
 	return &pb.DataRepeated{Data: dc}, nil
 }
 
+// Median returns median data for the last 24 hours for the requested dataType.
 func (server *Server) Median(_ context.Context, request *pb.DataRequest) (*pb.DataWithCategory, error) {
 	if request == nil {
 		return nil, errors.New("request can't be nil")
@@ -72,6 +76,7 @@ func (server *Server) Median(_ context.Context, request *pb.DataRequest) (*pb.Da
 	return median.Convert(), nil
 }
 
+// Max returns maximum data for the last 24 hours for the requested dataType.
 func (server *Server) Max(_ context.Context, request *pb.DataRequest) (*pb.DataWithCategory, error) {
 	if request == nil {
 		return nil, errors.New("request can't be nil")
@@ -85,6 +90,7 @@ func (server *Server) Max(_ context.Context, request *pb.DataRequest) (*pb.DataW
 	return max.Convert(), nil
 }
 
+// Min returns minimum data for the last 24 hours for the requested dataType.
 func (server *Server) Min(_ context.Context, request *pb.DataRequest) (*pb.DataWithCategory, error) {
 	if request == nil {
 		return nil, errors.New("request can't be nil")
