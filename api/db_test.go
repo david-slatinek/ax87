@@ -165,6 +165,34 @@ func TestMapValue(t *testing.T) {
 	}
 }
 
+// Test GetCategory
+func TestGetCategory(t *testing.T) {
+	var tests = []struct {
+		value, expected int
+		dataType        string
+	}{
+		{250, 5, carbonMonoxide},
+		{80, 3, carbonMonoxide},
+		{434, 6, carbonMonoxide},
+		{45, 1, airQuality},
+		{220, 5, airQuality},
+		{197, 4, airQuality},
+		{305, 2, raindrops},
+		{921, 4, raindrops},
+		{817, 3, raindrops},
+		{280, 83, soilMoisture},
+		{330, 63, soilMoisture},
+		{451, 15, soilMoisture},
+	}
+
+	for _, value := range tests {
+		ans := GetCategory(value.value, value.dataType)
+		if ans != value.expected {
+			t.Errorf("Expected %d with GetCategory(%d), got %d", value.expected, value.value, ans)
+		}
+	}
+}
+
 // Test DB.Latest.
 func TestDB_Latest(t *testing.T) {
 	_ = Load("test.env")
