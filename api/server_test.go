@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// Test Server.Add.
 func TestServer_Add(t *testing.T) {
 	_ = Load("test.env")
 
@@ -42,6 +43,7 @@ func TestServer_Add(t *testing.T) {
 	}
 }
 
+// Test Server.Latest.
 func TestServer_Latest(t *testing.T) {
 	_ = Load("test.env")
 
@@ -73,5 +75,108 @@ func TestServer_Latest(t *testing.T) {
 		t.Errorf("Expected: %v", expected)
 		t.Errorf("Result: %v", &dc)
 		t.FailNow()
+	}
+}
+
+// Test Server.Last24H.
+func TestServer_Last24H(t *testing.T) {
+	_ = Load("test.env")
+
+	db := DB{}
+	db.LoadFields()
+	_ = db.Connect()
+	defer db.client.Close()
+
+	_ = db.Init()
+
+	creationTime := time.Now().Round(0)
+
+	var objects = []struct {
+		data     Data
+		expected pb.DataWithCategory
+	}{
+		{Data{
+			DataType:  raindrops,
+			Value:     77,
+			TimeStamp: creationTime,
+		}, pb.DataWithCategory{
+			Data: &pb.Data{
+				DataType:  pb.DataType_RAINDROPS,
+				Value:     77,
+				Timestamp: timestamppb.New(creationTime),
+			},
+			Category: int32(GetCategory(77, raindrops)),
+		}},
+		{Data{
+			DataType:  raindrops,
+			Value:     87,
+			TimeStamp: creationTime.Add(time.Second * -5),
+		}, pb.DataWithCategory{
+			Data: &pb.Data{
+				DataType:  pb.DataType_RAINDROPS,
+				Value:     87,
+				Timestamp: timestamppb.New(creationTime.Add(time.Second * -5)),
+			},
+			Category: int32(GetCategory(87, raindrops)),
+		}},
+		{Data{
+			DataType:  raindrops,
+			Value:     224,
+			TimeStamp: creationTime.Add(time.Minute * -10),
+		}, pb.DataWithCategory{
+			Data: &pb.Data{
+				DataType:  pb.DataType_RAINDROPS,
+				Value:     224,
+				Timestamp: timestamppb.New(creationTime.Add(time.Minute * -10)),
+			},
+			Category: int32(GetCategory(224, raindrops)),
+		}},
+		{Data{
+			DataType:  raindrops,
+			Value:     400,
+			TimeStamp: creationTime.Add(time.Hour * -7),
+		}, pb.DataWithCategory{
+			Data: &pb.Data{
+				DataType:  pb.DataType_RAINDROPS,
+				Value:     400,
+				Timestamp: timestamppb.New(creationTime.Add(time.Hour * -7)),
+			},
+			Category: int32(GetCategory(400, raindrops)),
+		}},
+		{Data{
+			DataType:  raindrops,
+			Value:     21,
+			TimeStamp: creationTime.Add(time.Hour * -12),
+		}, pb.DataWithCategory{
+			Data: &pb.Data{
+				DataType:  pb.DataType_RAINDROPS,
+				Value:     21,
+				Timestamp: timestamppb.New(creationTime.Add(time.Hour * -12)),
+			},
+			Category: int32(GetCategory(21, raindrops)),
+		}},
+	}
+
+	for _, v := range objects {
+		db.Add(&v.data)
+	}
+
+	server := Server{dbService: &db}
+	dr, err := server.Last24H(context.Background(), &pb.DataRequest{DataType: pb.DataType_RAINDROPS})
+
+	if err != nil {
+		t.Fatalf("Expected nil with Last24H, got %v", err)
+	}
+
+	if len(dr.Data) != len(objects) {
+		t.Fatalf("Expected length %d, got %d", len(objects), len(dr.Data))
+	}
+
+	for k, v := range objects {
+		if !Equals(&v.expected, dr.Data[k]) {
+			t.Error("Objects are not the same")
+			t.Errorf("Expected: %v", &v.expected)
+			t.Errorf("Result: %v", dr.Data[k])
+		}
 	}
 }
