@@ -1,13 +1,14 @@
 package main
 
 import (
+	"api/env"
 	"testing"
 	"time"
 )
 
 // Test DB.LoadFields.
 func TestDB_LoadFields(t *testing.T) {
-	_ = Load("test.env")
+	_ = env.Load("env/test.env")
 
 	db := DB{}
 	db.LoadFields()
@@ -31,7 +32,7 @@ func TestDB_LoadFields(t *testing.T) {
 
 // Test DB.Connect.
 func TestDB_Connect(t *testing.T) {
-	_ = Load("test.env")
+	_ = env.Load("env/test.env")
 
 	db := DB{}
 	db.LoadFields()
@@ -44,7 +45,7 @@ func TestDB_Connect(t *testing.T) {
 
 // Test DB.Init
 func TestDB_Init(t *testing.T) {
-	_ = Load("test.env")
+	_ = env.Load("env/test.env")
 
 	db := DB{}
 	db.LoadFields()
@@ -195,7 +196,7 @@ func TestGetCategory(t *testing.T) {
 
 // Test DB.Latest.
 func TestDB_Latest(t *testing.T) {
-	_ = Load("test.env")
+	_ = env.Load("env/test.env")
 
 	db := DB{}
 	db.LoadFields()
@@ -282,7 +283,7 @@ func TestDB_Latest(t *testing.T) {
 
 // Test DB.Last24H.
 func TestDB_Last24H(t *testing.T) {
-	_ = Load("test.env")
+	_ = env.Load("env/test.env")
 
 	db := DB{}
 	db.LoadFields()
@@ -383,7 +384,7 @@ func TestDB_Last24H(t *testing.T) {
 
 // Test DB.Median.
 func TestDB_Median(t *testing.T) {
-	_ = Load("test.env")
+	_ = env.Load("env/test.env")
 
 	db := DB{}
 	db.LoadFields()
@@ -449,7 +450,7 @@ func TestDB_Median(t *testing.T) {
 
 // Test DB.Max.
 func TestDB_Max(t *testing.T) {
-	_ = Load("test.env")
+	_ = env.Load("env/test.env")
 
 	db := DB{}
 	db.LoadFields()
@@ -515,7 +516,7 @@ func TestDB_Max(t *testing.T) {
 
 // Test DB.Min.
 func TestDB_Min(t *testing.T) {
-	_ = Load("test.env")
+	_ = env.Load("env/test.env")
 
 	db := DB{}
 	db.LoadFields()

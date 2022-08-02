@@ -1,6 +1,7 @@
 package main
 
 import (
+	"api/env"
 	pb "api/schema"
 	"context"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -10,7 +11,7 @@ import (
 
 // Test Server.Add.
 func TestServer_Add(t *testing.T) {
-	_ = Load("test.env")
+	_ = env.Load("env/test.env")
 
 	db := DB{}
 	db.LoadFields()
@@ -45,7 +46,7 @@ func TestServer_Add(t *testing.T) {
 
 // Test Server.Latest.
 func TestServer_Latest(t *testing.T) {
-	_ = Load("test.env")
+	_ = env.Load("env/test.env")
 
 	db := DB{}
 	db.LoadFields()
@@ -80,7 +81,7 @@ func TestServer_Latest(t *testing.T) {
 
 // Test Server.Last24H.
 func TestServer_Last24H(t *testing.T) {
-	_ = Load("test.env")
+	_ = env.Load("env/test.env")
 
 	db := DB{}
 	db.LoadFields()
@@ -182,7 +183,7 @@ func TestServer_Last24H(t *testing.T) {
 }
 
 func TestServer_Median(t *testing.T) {
-	_ = Load("test.env")
+	_ = env.Load("env/test.env")
 
 	db := DB{}
 	db.LoadFields()
@@ -250,7 +251,7 @@ func TestServer_Median(t *testing.T) {
 
 // Test Server.Max.
 func TestServer_Max(t *testing.T) {
-	_ = Load("test.env")
+	_ = env.Load("env/test.env")
 
 	db := DB{}
 	db.LoadFields()
@@ -318,7 +319,7 @@ func TestServer_Max(t *testing.T) {
 
 // Test Server.Min.
 func TestServer_Min(t *testing.T) {
-	_ = Load("test.env")
+	_ = env.Load("env/test.env")
 
 	db := DB{}
 	db.LoadFields()

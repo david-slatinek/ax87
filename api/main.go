@@ -1,6 +1,7 @@
 package main
 
 import (
+	"api/env"
 	pb "api/schema"
 	"context"
 	"google.golang.org/grpc"
@@ -11,12 +12,12 @@ import (
 )
 
 func main() {
-	err := Load(".env")
+	err := env.Load("env/.env")
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
 
-	err = Validate()
+	err = env.Validate()
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
