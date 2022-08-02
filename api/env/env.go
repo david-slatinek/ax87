@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-// Load environment variables from '.env' file.
+// Load environment variables from the '.env' file.
 func Load(fileName string) error {
 	return godotenv.Load(fileName)
 }

@@ -10,7 +10,7 @@ import (
 type DataResponse struct {
 	// Embedded Data struct.
 	Data
-	// Data.Value category. Check functions MapCO2, MapAir, and MapValue.
+	// Data.Value category. Check functions util.GetCategory.
 	Category int
 }
 

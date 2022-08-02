@@ -16,21 +16,6 @@ const (
 	SoilMoisture = "SOIL_MOISTURE"
 )
 
-// GetCategory gets category for specific dataType.
-func GetCategory(value int, dataType string) int {
-	switch dataType {
-	case CarbonMonoxide:
-		return MapCO2(value)
-	case AirQuality:
-		return MapAir(value)
-	case Raindrops:
-		return MapValue(float64(value), 0, 1024, 1, 4)
-	case SoilMoisture:
-		return MapValue(float64(value), 489, 238, 0, 100)
-	}
-	return -1
-}
-
 // MapCO2 value to 7 categories, with 1 being the best.
 func MapCO2(value int) int {
 	if value <= 30 {
@@ -70,13 +55,28 @@ func MapValue(x float64, inMin float64, inMax float64, outMin float64, outMax fl
 	return int((math.Round(x-inMin)*(outMax-outMin)/(inMax-inMin) + outMin) + 0.5)
 }
 
-// EqualsData compares two pb.DataWithCategory structures. Checks only pb.Data field.
-func EqualsData(a, b *pb.DataWithCategory) bool {
+// equalsData compares two pb.DataWithCategory structures. Checks only pb.Data field.
+func equalsData(a, b *pb.DataWithCategory) bool {
 	return a.Data.DataType == b.Data.DataType && a.Data.Value == b.Data.Value &&
 		a.Data.Timestamp.AsTime().Equal(b.Data.Timestamp.AsTime())
 }
 
 // Equals compares two pb.DataWithCategory structures.
 func Equals(a, b *pb.DataWithCategory) bool {
-	return EqualsData(a, b) && a.Category == b.Category
+	return equalsData(a, b) && a.Category == b.Category
+}
+
+// GetCategory returns category for a specific dataType.
+func GetCategory(value int, dataType string) int {
+	switch dataType {
+	case CarbonMonoxide:
+		return MapCO2(value)
+	case AirQuality:
+		return MapAir(value)
+	case Raindrops:
+		return MapValue(float64(value), 0, 1024, 1, 4)
+	case SoilMoisture:
+		return MapValue(float64(value), 489, 238, 0, 100)
+	}
+	return -1
 }

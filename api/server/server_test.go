@@ -41,7 +41,7 @@ func TestServer_Add(t *testing.T) {
 	r := pb.Reply{}
 
 	if reply.String() != r.String() {
-		t.Error("Objects not the same")
+		t.Error("Objects are not the same")
 		t.Errorf("Expected: %v", &r)
 		t.Errorf("Result: %v", reply)
 		t.FailNow()
@@ -170,11 +170,11 @@ func TestServer_Last24H(t *testing.T) {
 
 	dr, err := srv.Last24H(context.Background(), &pb.DataRequest{DataType: pb.DataType_RAINDROPS})
 	if err != nil {
-		t.Fatalf("Expected nil with Last24H, got %v", err)
+		t.Fatalf("Expected nil with Server.Last24H, got %v", err)
 	}
 
 	if len(dr.Data) != len(objects) {
-		t.Fatalf("Expected length %d, got %d", len(objects), len(dr.Data))
+		t.Fatalf("Expected length of %d, got %d", len(objects), len(dr.Data))
 	}
 
 	for k, v := range objects {
@@ -186,6 +186,7 @@ func TestServer_Last24H(t *testing.T) {
 	}
 }
 
+// Test Server.Median.
 func TestServer_Median(t *testing.T) {
 	_ = env.Load("env/test.env")
 
@@ -234,7 +235,7 @@ func TestServer_Median(t *testing.T) {
 
 	dc, err := srv.Median(context.Background(), &pb.DataRequest{DataType: pb.DataType_SOIL_MOISTURE})
 	if err != nil {
-		t.Fatalf("Expected nil with Median, got %v", err)
+		t.Fatalf("Expected nil with Server.Median, got %v", err)
 	}
 
 	dr := pb.DataWithCategory{
@@ -302,7 +303,7 @@ func TestServer_Max(t *testing.T) {
 
 	dc, err := srv.Max(context.Background(), &pb.DataRequest{DataType: pb.DataType_CARBON_MONOXIDE})
 	if err != nil {
-		t.Fatalf("Expected nil with Max, got %v", err)
+		t.Fatalf("Expected nil with Server.Max, got %v", err)
 	}
 
 	dr := pb.DataWithCategory{
@@ -370,7 +371,7 @@ func TestServer_Min(t *testing.T) {
 
 	dc, err := srv.Min(context.Background(), &pb.DataRequest{DataType: pb.DataType_AIR_QUALITY})
 	if err != nil {
-		t.Fatalf("Expected nil with Min, got %v", err)
+		t.Fatalf("Expected nil with Server.Min, got %v", err)
 	}
 
 	dr := pb.DataWithCategory{

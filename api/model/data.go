@@ -8,9 +8,9 @@ import (
 	"time"
 )
 
-// Data is a struct used for serializing data to the database and rarely from the database - only used with functions DB.Median, DB.Max, DB.Min.
+// Data is a struct used for serializing data to the database.
 type Data struct {
-	// Presents data type. Use constants: carbonMonoxide, airQuality, raindrops, soilMoisture.
+	// Presents data type. Use constants: util.CarbonMonoxide, util.AirQuality, util.Raindrops, util.SoilMoisture.
 	DataType string
 	// Sensor value.
 	Value float32

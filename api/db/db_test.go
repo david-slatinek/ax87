@@ -22,7 +22,7 @@ func TestDB_Connect(t *testing.T) {
 	defer dbb.Close()
 }
 
-// Test DB.Init
+// Test DB.Init.
 func TestDB_Init(t *testing.T) {
 	_ = env.Load("env/test.env")
 
@@ -63,7 +63,7 @@ func TestDB_Latest(t *testing.T) {
 				Value:     45,
 				Timestamp: creationTime,
 			},
-			Category: util.MapCO2(45),
+			Category: util.GetCategory(45, util.CarbonMonoxide),
 		}},
 		{model.Data{
 			DataType:  util.AirQuality,
@@ -75,7 +75,7 @@ func TestDB_Latest(t *testing.T) {
 				Value:     125,
 				Timestamp: creationTime,
 			},
-			Category: util.MapAir(125),
+			Category: util.GetCategory(125, util.AirQuality),
 		}},
 		{model.Data{
 			DataType:  util.Raindrops,
@@ -87,7 +87,7 @@ func TestDB_Latest(t *testing.T) {
 				Value:     800,
 				Timestamp: creationTime,
 			},
-			Category: util.MapValue(800, 0, 1024, 1, 4),
+			Category: util.GetCategory(800, util.Raindrops),
 		}},
 		{model.Data{
 			DataType:  util.SoilMoisture,
@@ -99,7 +99,7 @@ func TestDB_Latest(t *testing.T) {
 				Value:     400,
 				Timestamp: creationTime,
 			},
-			Category: util.MapValue(400, 489, 238, 0, 100),
+			Category: util.GetCategory(400, util.SoilMoisture),
 		}},
 	}
 
@@ -150,7 +150,7 @@ func TestDB_Last24H(t *testing.T) {
 				Value:     250,
 				Timestamp: creationTime,
 			},
-			Category: util.MapCO2(250),
+			Category: util.GetCategory(250, util.CarbonMonoxide),
 		}},
 		{model.Data{
 			DataType:  util.CarbonMonoxide,
@@ -162,7 +162,7 @@ func TestDB_Last24H(t *testing.T) {
 				Value:     55,
 				Timestamp: creationTime.Add(time.Second * -1),
 			},
-			Category: util.MapCO2(55),
+			Category: util.GetCategory(55, util.CarbonMonoxide),
 		}},
 		{model.Data{
 			DataType:  util.CarbonMonoxide,
@@ -174,7 +174,7 @@ func TestDB_Last24H(t *testing.T) {
 				Value:     420,
 				Timestamp: creationTime.Add(time.Second * -10),
 			},
-			Category: util.MapCO2(420),
+			Category: util.GetCategory(420, util.CarbonMonoxide),
 		}},
 		{model.Data{
 			DataType:  util.CarbonMonoxide,
@@ -186,7 +186,7 @@ func TestDB_Last24H(t *testing.T) {
 				Value:     69,
 				Timestamp: creationTime.Add(time.Minute * -1),
 			},
-			Category: util.MapCO2(69),
+			Category: util.GetCategory(69, util.CarbonMonoxide),
 		}},
 		{model.Data{
 			DataType:  util.CarbonMonoxide,
@@ -198,7 +198,7 @@ func TestDB_Last24H(t *testing.T) {
 				Value:     170,
 				Timestamp: creationTime.Add(time.Minute * -2),
 			},
-			Category: util.MapCO2(170),
+			Category: util.GetCategory(170, util.CarbonMonoxide),
 		}},
 	}
 
@@ -212,7 +212,7 @@ func TestDB_Last24H(t *testing.T) {
 	}
 
 	if len(*dr) != len(objects) {
-		t.Fatalf("Expected length %d, got %d", len(objects), len(*dr))
+		t.Fatalf("Expected length of %d, got %d", len(objects), len(*dr))
 	}
 
 	for k, v := range *dr {
@@ -280,7 +280,7 @@ func TestDB_Median(t *testing.T) {
 			Value:     195,
 			Timestamp: creationTime.Add(time.Minute * -1),
 		},
-		Category: util.MapAir(195),
+		Category: util.GetCategory(195, util.AirQuality),
 	}
 
 	if !d.Equals(&dr) {
@@ -346,7 +346,7 @@ func TestDB_Max(t *testing.T) {
 			Value:     842,
 			Timestamp: creationTime.Add(time.Minute * -2),
 		},
-		Category: util.MapValue(842, 0, 1024, 1, 4),
+		Category: util.GetCategory(842, util.Raindrops),
 	}
 
 	if !d.Equals(&dr) {
@@ -412,7 +412,7 @@ func TestDB_Min(t *testing.T) {
 			Value:     250,
 			Timestamp: creationTime.Add(time.Second * -10),
 		},
-		Category: util.MapValue(250, 489, 238, 0, 100),
+		Category: util.GetCategory(250, util.SoilMoisture),
 	}
 
 	if !d.Equals(&dr) {

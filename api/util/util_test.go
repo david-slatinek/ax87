@@ -1,11 +1,14 @@
 package util_test
 
 import (
+	pb "api/schema"
 	"api/util"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"testing"
+	"time"
 )
 
-// Test util.MapCO2.
+// Test MapCO2.
 func TestMapCO2(t *testing.T) {
 	var tests = []struct {
 		value, expected int
@@ -39,7 +42,7 @@ func TestMapCO2(t *testing.T) {
 	for _, value := range tests {
 		ans := util.MapCO2(value.value)
 		if ans != value.expected {
-			t.Errorf("Expected %d with util.MapCO2(%d), got %d", value.expected, value.value, ans)
+			t.Errorf("Expected %d with MapCO2(%d), got %d", value.expected, value.value, ans)
 		}
 	}
 }
@@ -110,6 +113,69 @@ func TestMapValue(t *testing.T) {
 		ans := util.MapValue(value.x, value.inMin, value.inMax, value.outMin, value.outMax)
 		if ans != value.expected {
 			t.Errorf("Expected %d with MapValue(%f), got %d", value.expected, value.x, ans)
+		}
+	}
+}
+
+// Test Equals.
+func TestEquals(t *testing.T) {
+	creationTime := time.Now().Round(0)
+
+	var tests = []struct {
+		a, b     *pb.DataWithCategory
+		expected bool
+	}{
+		{&pb.DataWithCategory{
+			Data: &pb.Data{
+				DataType:  pb.DataType_AIR_QUALITY,
+				Value:     166,
+				Timestamp: timestamppb.New(creationTime),
+			},
+			Category: int32(util.GetCategory(166, util.AirQuality)),
+		}, &pb.DataWithCategory{
+			Data: &pb.Data{
+				DataType:  pb.DataType_AIR_QUALITY,
+				Value:     166,
+				Timestamp: timestamppb.New(creationTime),
+			},
+			Category: int32(util.GetCategory(166, util.AirQuality))}, true,
+		},
+		{&pb.DataWithCategory{
+			Data: &pb.Data{
+				DataType:  pb.DataType_SOIL_MOISTURE,
+				Value:     300,
+				Timestamp: timestamppb.New(creationTime.Add(time.Second * 20)),
+			},
+			Category: int32(util.GetCategory(300, util.SoilMoisture)),
+		}, &pb.DataWithCategory{
+			Data: &pb.Data{
+				DataType:  pb.DataType_SOIL_MOISTURE,
+				Value:     200,
+				Timestamp: timestamppb.New(creationTime.Add(time.Second * 20)),
+			},
+			Category: int32(util.GetCategory(300, util.SoilMoisture))}, false,
+		},
+		{&pb.DataWithCategory{
+			Data: &pb.Data{
+				DataType:  pb.DataType_AIR_QUALITY,
+				Value:     250,
+				Timestamp: timestamppb.New(creationTime.Add(time.Minute * 2)),
+			},
+			Category: int32(util.GetCategory(250, util.AirQuality)),
+		}, &pb.DataWithCategory{
+			Data: &pb.Data{
+				DataType:  pb.DataType_AIR_QUALITY,
+				Value:     250,
+				Timestamp: timestamppb.New(creationTime.Add(time.Minute * 2)),
+			},
+			Category: int32(util.GetCategory(250, util.AirQuality))}, true,
+		},
+	}
+
+	for _, value := range tests {
+		ans := util.Equals(value.a, value.b)
+		if ans != value.expected {
+			t.Errorf("Expected %t with util.Equals, got %t", value.expected, ans)
 		}
 	}
 }

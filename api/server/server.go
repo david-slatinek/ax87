@@ -8,9 +8,10 @@ import (
 	"errors"
 )
 
+// Server is a struct that acts as an intermediate layer between db.DB and grpc default server.
 type Server struct {
 	pb.UnimplementedRequestServer
-	// DB field.
+	// db.DB field.
 	DBService *db.DB
 }
 
