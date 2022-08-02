@@ -1,6 +1,7 @@
 package main
 
 import (
+	"api/models"
 	pb "api/schema"
 	"context"
 	"errors"
@@ -18,7 +19,7 @@ func (server *Server) Add(_ context.Context, data *pb.Data) (*pb.Reply, error) {
 		return &pb.Reply{}, errors.New("data can't be nil")
 	}
 
-	d := Data{
+	d := model.Data{
 		DataType:  data.GetDataType().String(),
 		Value:     data.GetValue(),
 		TimeStamp: data.GetTimestamp().AsTime(),

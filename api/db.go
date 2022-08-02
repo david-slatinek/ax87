@@ -1,12 +1,13 @@
 package main
 
 import (
+	"api/models"
+	"api/util"
 	"context"
 	"errors"
 	"fmt"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/domain"
-	"math"
 	"os"
 	"time"
 )
@@ -84,62 +85,8 @@ func (db *DB) Init() error {
 	return err
 }
 
-// MapCO2 value to 7 categories, with 1 being the best.
-func MapCO2(value int) int {
-	if value <= 30 {
-		return 1
-	} else if value > 30 && value <= 70 {
-		return 2
-	} else if value > 70 && value <= 150 {
-		return 3
-	} else if value > 150 && value <= 200 {
-		return 4
-	} else if value > 200 && value <= 400 {
-		return 5
-	} else if value > 400 && value <= 800 {
-		return 6
-	}
-	return 7
-}
-
-// MapAir quality value to 6 categories, with 1 being the best.
-func MapAir(value int) int {
-	if value <= 50 {
-		return 1
-	} else if value > 50 && value <= 100 {
-		return 2
-	} else if value > 100 && value <= 150 {
-		return 3
-	} else if value > 150 && value <= 200 {
-		return 4
-	} else if value > 200 && value <= 300 {
-		return 5
-	}
-	return 6
-}
-
-// MapValue from one range to another.
-func MapValue(x float64, inMin float64, inMax float64, outMin float64, outMax float64) int {
-	return int((math.Round(x-inMin)*(outMax-outMin)/(inMax-inMin) + outMin) + 0.5)
-}
-
-// GetCategory gets category for specific dataType.
-func GetCategory(value int, dataType string) int {
-	switch dataType {
-	case carbonMonoxide:
-		return MapCO2(value)
-	case airQuality:
-		return MapAir(value)
-	case raindrops:
-		return MapValue(float64(value), 0, 1024, 1, 4)
-	case soilMoisture:
-		return MapValue(float64(value), 489, 238, 0, 100)
-	}
-	return -1
-}
-
 // Add new data to the db.
-func (db *DB) Add(data *Data) {
+func (db *DB) Add(data *model.Data) {
 	if db == nil || data == nil || db.client == nil {
 		return
 	}
@@ -147,24 +94,24 @@ func (db *DB) Add(data *Data) {
 	p := influxdb2.NewPointWithMeasurement(data.DataType).AddField("value", data.Value).SetTime(data.TimeStamp.Round(0))
 
 	switch data.DataType {
-	case raindrops:
+	case util.Raindrops:
 		if int(data.Value) < 0 || int(data.Value) > 1024 {
 			return
 		}
-	case soilMoisture:
+	case util.SoilMoisture:
 		if int(data.Value) < 238 || int(data.Value) > 489 {
 			return
 		}
 	}
 
-	p.AddField("category", GetCategory(int(data.Value), data.DataType))
+	p.AddField("category", util.GetCategory(int(data.Value), data.DataType))
 
 	writeAPI.WritePoint(p)
 	writeAPI.Flush()
 }
 
 // Latest returns the latest data for the requested dataType.
-func (db *DB) Latest(dataType string) (*DataResponse, error) {
+func (db *DB) Latest(dataType string) (*model.DataResponse, error) {
 	if db == nil {
 		return nil, errors.New("db can't be nil")
 	}
@@ -179,7 +126,7 @@ func (db *DB) Latest(dataType string) (*DataResponse, error) {
 			|> filter(fn: (r) => r._measurement == "%s")
 			|> last()`, db.bucket, dataType)
 
-	dr := DataResponse{}
+	dr := model.DataResponse{}
 
 	result, err := queryAPI.Query(context.Background(), query)
 	if err != nil || result.Err() != nil {
@@ -219,7 +166,7 @@ func (db *DB) Latest(dataType string) (*DataResponse, error) {
 }
 
 // Last24H returns data for the last 24 hours for the requested dataType.
-func (db *DB) Last24H(dataType string) (*[]DataResponse, error) {
+func (db *DB) Last24H(dataType string) (*[]model.DataResponse, error) {
 	if db == nil {
 		return nil, errors.New("db can't be nil")
 	}
@@ -266,11 +213,11 @@ func (db *DB) Last24H(dataType string) (*[]DataResponse, error) {
 		return nil, errors.New("different lengths of categories, values, and timestamps")
 	}
 
-	var data []DataResponse
+	var data []model.DataResponse
 
 	for index, value := range categories {
-		data = append(data, DataResponse{
-			Data: Data{
+		data = append(data, model.DataResponse{
+			Data: model.Data{
 				DataType:  dataType,
 				Value:     values[index],
 				TimeStamp: tm[index],
@@ -283,7 +230,7 @@ func (db *DB) Last24H(dataType string) (*[]DataResponse, error) {
 }
 
 // RetrieveData returns data for the given query. Only used for Median, Max and Min to prevent code duplication.
-func (db *DB) RetrieveData(query, dataType string) (*DataResponse, error) {
+func (db *DB) RetrieveData(query, dataType string) (*model.DataResponse, error) {
 	if db == nil {
 		return nil, errors.New("db can't be nil")
 	}
@@ -299,7 +246,7 @@ func (db *DB) RetrieveData(query, dataType string) (*DataResponse, error) {
 		return nil, err
 	}
 
-	dr := DataResponse{}
+	dr := model.DataResponse{}
 	isData := false
 
 	for result.Next() {
@@ -317,23 +264,13 @@ func (db *DB) RetrieveData(query, dataType string) (*DataResponse, error) {
 
 	dr.DataType = result.Record().Measurement()
 	dr.TimeStamp = result.Record().Time().Local()
-
-	switch dataType {
-	case carbonMonoxide:
-		dr.Category = MapCO2(int(dr.Value))
-	case airQuality:
-		dr.Category = MapAir(int(dr.Value))
-	case raindrops:
-		dr.Category = MapValue(float64(dr.Value), 0, 1024, 1, 4)
-	case soilMoisture:
-		dr.Category = MapValue(float64(dr.Value), 489, 238, 0, 100)
-	}
+	dr.Category = util.GetCategory(int(dr.Value), dataType)
 
 	return &dr, nil
 }
 
 // Median returns median data for the last 24 hours for the requested dataType.
-func (db *DB) Median(dataType string) (*DataResponse, error) {
+func (db *DB) Median(dataType string) (*model.DataResponse, error) {
 	if db == nil {
 		return nil, errors.New("db can't be nil")
 	}
@@ -349,7 +286,7 @@ func (db *DB) Median(dataType string) (*DataResponse, error) {
 }
 
 // Max returns maximum data for the last 24 hours for the requested dataType.
-func (db *DB) Max(dataType string) (*DataResponse, error) {
+func (db *DB) Max(dataType string) (*model.DataResponse, error) {
 	if db == nil {
 		return nil, errors.New("db can't be nil")
 	}
@@ -365,7 +302,7 @@ func (db *DB) Max(dataType string) (*DataResponse, error) {
 }
 
 // Min returns minimum data for the last 24 hours for the requested dataType.
-func (db *DB) Min(dataType string) (*DataResponse, error) {
+func (db *DB) Min(dataType string) (*model.DataResponse, error) {
 	if db == nil {
 		return nil, errors.New("db can't be nil")
 	}

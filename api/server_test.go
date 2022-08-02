@@ -2,7 +2,9 @@ package main
 
 import (
 	"api/env"
+	model "api/models"
 	pb "api/schema"
+	"api/util"
 	"context"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"testing"
@@ -55,8 +57,8 @@ func TestServer_Latest(t *testing.T) {
 
 	_ = db.Init()
 
-	data := Data{
-		DataType:  airQuality,
+	data := model.Data{
+		DataType:  util.AirQuality,
 		Value:     183,
 		TimeStamp: time.Now().Round(0),
 	}
@@ -71,7 +73,7 @@ func TestServer_Latest(t *testing.T) {
 
 	expected := data.ConvertToDC()
 
-	if !Equals(dc, expected) {
+	if !util.Equals(dc, expected) {
 		t.Error("Objects are not the same")
 		t.Errorf("Expected: %v", expected)
 		t.Errorf("Result: %v", &dc)
@@ -93,11 +95,11 @@ func TestServer_Last24H(t *testing.T) {
 	creationTime := time.Now().Round(0)
 
 	var objects = []struct {
-		data     Data
+		data     model.Data
 		expected pb.DataWithCategory
 	}{
-		{Data{
-			DataType:  raindrops,
+		{model.Data{
+			DataType:  util.Raindrops,
 			Value:     77,
 			TimeStamp: creationTime,
 		}, pb.DataWithCategory{
@@ -106,10 +108,10 @@ func TestServer_Last24H(t *testing.T) {
 				Value:     77,
 				Timestamp: timestamppb.New(creationTime),
 			},
-			Category: int32(GetCategory(77, raindrops)),
+			Category: int32(util.GetCategory(77, util.Raindrops)),
 		}},
-		{Data{
-			DataType:  raindrops,
+		{model.Data{
+			DataType:  util.Raindrops,
 			Value:     87,
 			TimeStamp: creationTime.Add(time.Second * -5),
 		}, pb.DataWithCategory{
@@ -118,10 +120,10 @@ func TestServer_Last24H(t *testing.T) {
 				Value:     87,
 				Timestamp: timestamppb.New(creationTime.Add(time.Second * -5)),
 			},
-			Category: int32(GetCategory(87, raindrops)),
+			Category: int32(util.GetCategory(87, util.Raindrops)),
 		}},
-		{Data{
-			DataType:  raindrops,
+		{model.Data{
+			DataType:  util.Raindrops,
 			Value:     224,
 			TimeStamp: creationTime.Add(time.Minute * -10),
 		}, pb.DataWithCategory{
@@ -130,10 +132,10 @@ func TestServer_Last24H(t *testing.T) {
 				Value:     224,
 				Timestamp: timestamppb.New(creationTime.Add(time.Minute * -10)),
 			},
-			Category: int32(GetCategory(224, raindrops)),
+			Category: int32(util.GetCategory(224, util.Raindrops)),
 		}},
-		{Data{
-			DataType:  raindrops,
+		{model.Data{
+			DataType:  util.Raindrops,
 			Value:     400,
 			TimeStamp: creationTime.Add(time.Hour * -7),
 		}, pb.DataWithCategory{
@@ -142,10 +144,10 @@ func TestServer_Last24H(t *testing.T) {
 				Value:     400,
 				Timestamp: timestamppb.New(creationTime.Add(time.Hour * -7)),
 			},
-			Category: int32(GetCategory(400, raindrops)),
+			Category: int32(util.GetCategory(400, util.Raindrops)),
 		}},
-		{Data{
-			DataType:  raindrops,
+		{model.Data{
+			DataType:  util.Raindrops,
 			Value:     21,
 			TimeStamp: creationTime.Add(time.Hour * -12),
 		}, pb.DataWithCategory{
@@ -154,7 +156,7 @@ func TestServer_Last24H(t *testing.T) {
 				Value:     21,
 				Timestamp: timestamppb.New(creationTime.Add(time.Hour * -12)),
 			},
-			Category: int32(GetCategory(21, raindrops)),
+			Category: int32(util.GetCategory(21, util.Raindrops)),
 		}},
 	}
 
@@ -174,7 +176,7 @@ func TestServer_Last24H(t *testing.T) {
 	}
 
 	for k, v := range objects {
-		if !Equals(&v.expected, dr.Data[k]) {
+		if !util.Equals(&v.expected, dr.Data[k]) {
 			t.Error("Objects are not the same")
 			t.Errorf("Expected: %v", &v.expected)
 			t.Errorf("Result: %v", dr.Data[k])
@@ -194,29 +196,29 @@ func TestServer_Median(t *testing.T) {
 
 	creationTime := time.Now().Round(0)
 
-	var objects = [5]Data{
+	var objects = [5]model.Data{
 		{
-			DataType:  soilMoisture,
+			DataType:  util.SoilMoisture,
 			Value:     222,
 			TimeStamp: creationTime.Add(time.Minute * -3),
 		},
 		{
-			DataType:  soilMoisture,
+			DataType:  util.SoilMoisture,
 			Value:     312,
 			TimeStamp: creationTime.Add(time.Second * -4),
 		},
 		{
-			DataType:  soilMoisture,
+			DataType:  util.SoilMoisture,
 			Value:     294,
 			TimeStamp: creationTime.Add(time.Second * -5),
 		},
 		{
-			DataType:  soilMoisture,
+			DataType:  util.SoilMoisture,
 			Value:     431,
 			TimeStamp: creationTime.Add(time.Hour * -17),
 		},
 		{
-			DataType:  soilMoisture,
+			DataType:  util.SoilMoisture,
 			Value:     401,
 			TimeStamp: creationTime.Add(time.Hour * -1),
 		},
@@ -239,10 +241,10 @@ func TestServer_Median(t *testing.T) {
 			Value:     312,
 			Timestamp: timestamppb.New(creationTime.Add(time.Second * -4)),
 		},
-		Category: int32(GetCategory(312, soilMoisture)),
+		Category: int32(util.GetCategory(312, util.SoilMoisture)),
 	}
 
-	if !Equals(dc, &dr) {
+	if !util.Equals(dc, &dr) {
 		t.Error("Objects are not the same")
 		t.Errorf("Expected: %v", &dr)
 		t.Errorf("Result: %v", dc)
@@ -262,29 +264,29 @@ func TestServer_Max(t *testing.T) {
 
 	creationTime := time.Now().Round(0)
 
-	var objects = [5]Data{
+	var objects = [5]model.Data{
 		{
-			DataType:  carbonMonoxide,
+			DataType:  util.CarbonMonoxide,
 			Value:     65,
 			TimeStamp: creationTime.Add(time.Minute * -2),
 		},
 		{
-			DataType:  carbonMonoxide,
+			DataType:  util.CarbonMonoxide,
 			Value:     741,
 			TimeStamp: creationTime.Add(time.Second * -45),
 		},
 		{
-			DataType:  carbonMonoxide,
+			DataType:  util.CarbonMonoxide,
 			Value:     132,
 			TimeStamp: creationTime.Add(time.Minute * -22),
 		},
 		{
-			DataType:  carbonMonoxide,
+			DataType:  util.CarbonMonoxide,
 			Value:     387,
 			TimeStamp: creationTime.Add(time.Hour * -3),
 		},
 		{
-			DataType:  carbonMonoxide,
+			DataType:  util.CarbonMonoxide,
 			Value:     25,
 			TimeStamp: creationTime.Add(time.Minute * -37),
 		},
@@ -307,10 +309,10 @@ func TestServer_Max(t *testing.T) {
 			Value:     741,
 			Timestamp: timestamppb.New(creationTime.Add(time.Second * -45)),
 		},
-		Category: int32(GetCategory(741, carbonMonoxide)),
+		Category: int32(util.GetCategory(741, util.CarbonMonoxide)),
 	}
 
-	if !Equals(dc, &dr) {
+	if !util.Equals(dc, &dr) {
 		t.Error("Objects are not the same")
 		t.Errorf("Expected: %v", &dr)
 		t.Errorf("Result: %v", dc)
@@ -330,29 +332,29 @@ func TestServer_Min(t *testing.T) {
 
 	creationTime := time.Now().Round(0)
 
-	var objects = [5]Data{
+	var objects = [5]model.Data{
 		{
-			DataType:  airQuality,
+			DataType:  util.AirQuality,
 			Value:     33,
 			TimeStamp: creationTime.Add(time.Second * -2),
 		},
 		{
-			DataType:  airQuality,
+			DataType:  util.AirQuality,
 			Value:     331,
 			TimeStamp: creationTime.Add(time.Hour * -4),
 		},
 		{
-			DataType:  airQuality,
+			DataType:  util.AirQuality,
 			Value:     363,
 			TimeStamp: creationTime.Add(time.Minute * -35),
 		},
 		{
-			DataType:  airQuality,
+			DataType:  util.AirQuality,
 			Value:     182,
 			TimeStamp: creationTime.Add(time.Hour * -7),
 		},
 		{
-			DataType:  airQuality,
+			DataType:  util.AirQuality,
 			Value:     167,
 			TimeStamp: creationTime.Add(time.Second * -37),
 		},
@@ -375,10 +377,10 @@ func TestServer_Min(t *testing.T) {
 			Value:     33,
 			Timestamp: timestamppb.New(creationTime.Add(time.Second * -2)),
 		},
-		Category: int32(GetCategory(33, airQuality)),
+		Category: int32(util.GetCategory(33, util.AirQuality)),
 	}
 
-	if !Equals(dc, &dr) {
+	if !util.Equals(dc, &dr) {
 		t.Error("Objects are not the same")
 		t.Errorf("Expected: %v", &dr)
 		t.Errorf("Result: %v", dc)

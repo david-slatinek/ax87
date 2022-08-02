@@ -2,6 +2,8 @@ package main
 
 import (
 	"api/env"
+	"api/models"
+	"api/util"
 	"testing"
 	"time"
 )
@@ -57,143 +59,6 @@ func TestDB_Init(t *testing.T) {
 	}
 }
 
-// Test MapCO2.
-func TestMapCO2(t *testing.T) {
-	var tests = []struct {
-		value, expected int
-	}{
-		{-10, 1},
-		{0, 1},
-		{17, 1},
-		{30, 1},
-		{42, 2},
-		{69, 2},
-		{85, 3},
-		{120, 3},
-		{150, 3},
-		{151, 4},
-		{188, 4},
-		{200, 4},
-		{217, 5},
-		{300, 5},
-		{361, 5},
-		{400, 5},
-		{470, 6},
-		{600, 6},
-		{707, 6},
-		{747, 6},
-		{800, 6},
-		{801, 7},
-		{900, 7},
-		{1000, 7},
-	}
-
-	for _, value := range tests {
-		ans := MapCO2(value.value)
-		if ans != value.expected {
-			t.Errorf("Expected %d with MapCO2(%d), got %d", value.expected, value.value, ans)
-		}
-	}
-}
-
-// Test MapAir.
-func TestMapAir(t *testing.T) {
-	var tests = []struct {
-		value, expected int
-	}{
-		{-10, 1},
-		{0, 1},
-		{17, 1},
-		{30, 1},
-		{50, 1},
-		{69, 2},
-		{85, 2},
-		{100, 2},
-		{120, 3},
-		{150, 3},
-		{188, 4},
-		{200, 4},
-		{217, 5},
-		{300, 5},
-		{361, 6},
-		{400, 6},
-	}
-
-	for _, value := range tests {
-		ans := MapAir(value.value)
-		if ans != value.expected {
-			t.Errorf("Expected %d with MapAir(%d), got %d", value.expected, value.value, ans)
-		}
-	}
-}
-
-// Test MapValue.
-func TestMapValue(t *testing.T) {
-	var tests = []struct {
-		x, inMin, inMax, outMin, outMax float64
-		expected                        int
-	}{
-		{0, 0, 1024, 1, 4, 1},
-		{1024, 0, 1024, 1, 4, 4},
-		{10, 0, 1024, 1, 4, 1},
-		{123, 0, 1024, 1, 4, 1},
-		{270, 0, 1024, 1, 4, 2},
-		{350, 0, 1024, 1, 4, 2},
-		{512, 0, 1024, 1, 4, 3},
-		{645, 0, 1024, 1, 4, 3},
-		{749, 0, 1024, 1, 4, 3},
-		{750, 0, 1024, 1, 4, 3},
-		{751, 0, 1024, 1, 4, 3},
-		{891, 0, 1024, 1, 4, 4},
-		{955, 0, 1024, 1, 4, 4},
-		{1000, 0, 1024, 1, 4, 4},
-		{1015, 0, 1024, 1, 4, 4},
-		{238, 489, 238, 0, 100, 100},
-		{489, 489, 238, 0, 100, 0},
-		{300, 489, 238, 0, 100, 75},
-		{250, 489, 238, 0, 100, 95},
-		{387, 489, 238, 0, 100, 41},
-		{480, 489, 238, 0, 100, 4},
-		{400, 489, 238, 0, 100, 35},
-		{290, 489, 238, 0, 100, 79},
-	}
-
-	for _, value := range tests {
-		ans := MapValue(value.x, value.inMin, value.inMax, value.outMin, value.outMax)
-		if ans != value.expected {
-			t.Errorf("Expected %d with MapValue(%f), got %d", value.expected, value.x, ans)
-		}
-	}
-}
-
-// Test GetCategory
-func TestGetCategory(t *testing.T) {
-	var tests = []struct {
-		value, expected int
-		dataType        string
-	}{
-		{250, 5, carbonMonoxide},
-		{80, 3, carbonMonoxide},
-		{434, 6, carbonMonoxide},
-		{45, 1, airQuality},
-		{220, 5, airQuality},
-		{197, 4, airQuality},
-		{305, 2, raindrops},
-		{921, 4, raindrops},
-		{817, 3, raindrops},
-		{280, 83, soilMoisture},
-		{330, 63, soilMoisture},
-		{451, 15, soilMoisture},
-	}
-
-	for _, value := range tests {
-		ans := GetCategory(value.value, value.dataType)
-		if ans != value.expected {
-			t.Errorf("Expected %d with GetCategory(%d), got %d", value.expected, value.value, ans)
-		}
-	}
-}
-
 // Test DB.Latest.
 func TestDB_Latest(t *testing.T) {
 	_ = env.Load("env/test.env")
@@ -208,56 +73,56 @@ func TestDB_Latest(t *testing.T) {
 	creationTime := time.Now().Round(0)
 
 	var objects = []struct {
-		data     Data
-		expected DataResponse
+		data     model.Data
+		expected model.DataResponse
 	}{
-		{Data{
-			DataType:  carbonMonoxide,
+		{model.Data{
+			DataType:  util.CarbonMonoxide,
 			Value:     45,
 			TimeStamp: creationTime,
-		}, DataResponse{
-			Data: Data{
-				DataType:  carbonMonoxide,
+		}, model.DataResponse{
+			Data: model.Data{
+				DataType:  util.CarbonMonoxide,
 				Value:     45,
 				TimeStamp: creationTime,
 			},
-			Category: MapCO2(45),
+			Category: util.MapCO2(45),
 		}},
-		{Data{
-			DataType:  airQuality,
+		{model.Data{
+			DataType:  util.AirQuality,
 			Value:     125,
 			TimeStamp: creationTime,
-		}, DataResponse{
-			Data: Data{
-				DataType:  airQuality,
+		}, model.DataResponse{
+			Data: model.Data{
+				DataType:  util.AirQuality,
 				Value:     125,
 				TimeStamp: creationTime,
 			},
-			Category: MapAir(125),
+			Category: util.MapAir(125),
 		}},
-		{Data{
-			DataType:  raindrops,
+		{model.Data{
+			DataType:  util.Raindrops,
 			Value:     800,
 			TimeStamp: creationTime,
-		}, DataResponse{
-			Data: Data{
-				DataType:  raindrops,
+		}, model.DataResponse{
+			Data: model.Data{
+				DataType:  util.Raindrops,
 				Value:     800,
 				TimeStamp: creationTime,
 			},
-			Category: MapValue(800, 0, 1024, 1, 4),
+			Category: util.MapValue(800, 0, 1024, 1, 4),
 		}},
-		{Data{
-			DataType:  soilMoisture,
+		{model.Data{
+			DataType:  util.SoilMoisture,
 			Value:     400,
 			TimeStamp: creationTime,
-		}, DataResponse{
-			Data: Data{
-				DataType:  soilMoisture,
+		}, model.DataResponse{
+			Data: model.Data{
+				DataType:  util.SoilMoisture,
 				Value:     400,
 				TimeStamp: creationTime,
 			},
-			Category: MapValue(400, 489, 238, 0, 100),
+			Category: util.MapValue(400, 489, 238, 0, 100),
 		}},
 	}
 
@@ -265,7 +130,7 @@ func TestDB_Latest(t *testing.T) {
 		db.Add(&v.data)
 	}
 
-	types := [4]string{carbonMonoxide, airQuality, raindrops, soilMoisture}
+	types := [4]string{util.CarbonMonoxide, util.AirQuality, util.Raindrops, util.SoilMoisture}
 
 	for k, v := range types {
 		dr, err := db.Latest(v)
@@ -295,68 +160,68 @@ func TestDB_Last24H(t *testing.T) {
 	creationTime := time.Now().Round(0)
 
 	var objects = []struct {
-		data     Data
-		expected DataResponse
+		data     model.Data
+		expected model.DataResponse
 	}{
-		{Data{
-			DataType:  carbonMonoxide,
+		{model.Data{
+			DataType:  util.CarbonMonoxide,
 			Value:     250,
 			TimeStamp: creationTime,
-		}, DataResponse{
-			Data: Data{
-				DataType:  carbonMonoxide,
+		}, model.DataResponse{
+			Data: model.Data{
+				DataType:  util.CarbonMonoxide,
 				Value:     250,
 				TimeStamp: creationTime,
 			},
-			Category: MapCO2(250),
+			Category: util.MapCO2(250),
 		}},
-		{Data{
-			DataType:  carbonMonoxide,
+		{model.Data{
+			DataType:  util.CarbonMonoxide,
 			Value:     55,
 			TimeStamp: creationTime.Add(time.Second * -1),
-		}, DataResponse{
-			Data: Data{
-				DataType:  carbonMonoxide,
+		}, model.DataResponse{
+			Data: model.Data{
+				DataType:  util.CarbonMonoxide,
 				Value:     55,
 				TimeStamp: creationTime.Add(time.Second * -1),
 			},
-			Category: MapCO2(55),
+			Category: util.MapCO2(55),
 		}},
-		{Data{
-			DataType:  carbonMonoxide,
+		{model.Data{
+			DataType:  util.CarbonMonoxide,
 			Value:     420,
 			TimeStamp: creationTime.Add(time.Second * -10),
-		}, DataResponse{
-			Data: Data{
-				DataType:  carbonMonoxide,
+		}, model.DataResponse{
+			Data: model.Data{
+				DataType:  util.CarbonMonoxide,
 				Value:     420,
 				TimeStamp: creationTime.Add(time.Second * -10),
 			},
-			Category: MapCO2(420),
+			Category: util.MapCO2(420),
 		}},
-		{Data{
-			DataType:  carbonMonoxide,
+		{model.Data{
+			DataType:  util.CarbonMonoxide,
 			Value:     69,
 			TimeStamp: creationTime.Add(time.Minute * -1),
-		}, DataResponse{
-			Data: Data{
-				DataType:  carbonMonoxide,
+		}, model.DataResponse{
+			Data: model.Data{
+				DataType:  util.CarbonMonoxide,
 				Value:     69,
 				TimeStamp: creationTime.Add(time.Minute * -1),
 			},
-			Category: MapCO2(69),
+			Category: util.MapCO2(69),
 		}},
-		{Data{
-			DataType:  carbonMonoxide,
+		{model.Data{
+			DataType:  util.CarbonMonoxide,
 			Value:     170,
 			TimeStamp: creationTime.Add(time.Minute * -2),
-		}, DataResponse{
-			Data: Data{
-				DataType:  carbonMonoxide,
+		}, model.DataResponse{
+			Data: model.Data{
+				DataType:  util.CarbonMonoxide,
 				Value:     170,
 				TimeStamp: creationTime.Add(time.Minute * -2),
 			},
-			Category: MapCO2(170),
+			Category: util.MapCO2(170),
 		}},
 	}
 
@@ -364,7 +229,7 @@ func TestDB_Last24H(t *testing.T) {
 		db.Add(&v.data)
 	}
 
-	dr, err := db.Last24H(carbonMonoxide)
+	dr, err := db.Last24H(util.CarbonMonoxide)
 	if err != nil {
 		t.Fatalf("Expected nil with Last24H, got %v", err)
 	}
@@ -395,29 +260,29 @@ func TestDB_Median(t *testing.T) {
 
 	creationTime := time.Now().Round(0)
 
-	var objects = [5]Data{
+	var objects = [5]model.Data{
 		{
-			DataType:  airQuality,
+			DataType:  util.AirQuality,
 			Value:     140,
 			TimeStamp: creationTime.Add(time.Minute * -2),
 		},
 		{
-			DataType:  airQuality,
+			DataType:  util.AirQuality,
 			Value:     205,
 			TimeStamp: creationTime.Add(time.Second * -2),
 		},
 		{
-			DataType:  airQuality,
+			DataType:  util.AirQuality,
 			Value:     270,
 			TimeStamp: creationTime.Add(time.Second * -5),
 		},
 		{
-			DataType:  airQuality,
+			DataType:  util.AirQuality,
 			Value:     33,
 			TimeStamp: creationTime.Add(time.Second * -21),
 		},
 		{
-			DataType:  airQuality,
+			DataType:  util.AirQuality,
 			Value:     195,
 			TimeStamp: creationTime.Add(time.Minute * -1),
 		},
@@ -427,18 +292,18 @@ func TestDB_Median(t *testing.T) {
 		db.Add(&v)
 	}
 
-	d, err := db.Median(airQuality)
+	d, err := db.Median(util.AirQuality)
 	if err != nil {
 		t.Fatalf("Expected nil with Median, got %v", err)
 	}
 
-	dr := DataResponse{
-		Data: Data{
-			DataType:  airQuality,
+	dr := model.DataResponse{
+		Data: model.Data{
+			DataType:  util.AirQuality,
 			Value:     195,
 			TimeStamp: creationTime.Add(time.Minute * -1),
 		},
-		Category: MapAir(195),
+		Category: util.MapAir(195),
 	}
 
 	if !d.Compare(&dr) {
@@ -461,29 +326,29 @@ func TestDB_Max(t *testing.T) {
 
 	creationTime := time.Now().Round(0)
 
-	var objects = [5]Data{
+	var objects = [5]model.Data{
 		{
-			DataType:  raindrops,
+			DataType:  util.Raindrops,
 			Value:     230,
 			TimeStamp: creationTime.Add(time.Minute * -1),
 		},
 		{
-			DataType:  raindrops,
+			DataType:  util.Raindrops,
 			Value:     420,
 			TimeStamp: creationTime.Add(time.Second * -3),
 		},
 		{
-			DataType:  raindrops,
+			DataType:  util.Raindrops,
 			Value:     114,
 			TimeStamp: creationTime.Add(time.Second * -7),
 		},
 		{
-			DataType:  raindrops,
+			DataType:  util.Raindrops,
 			Value:     47,
 			TimeStamp: creationTime.Add(time.Second * -41),
 		},
 		{
-			DataType:  raindrops,
+			DataType:  util.Raindrops,
 			Value:     842,
 			TimeStamp: creationTime.Add(time.Minute * -2),
 		},
@@ -493,18 +358,18 @@ func TestDB_Max(t *testing.T) {
 		db.Add(&v)
 	}
 
-	d, err := db.Max(raindrops)
+	d, err := db.Max(util.Raindrops)
 	if err != nil {
 		t.Fatalf("Expected nil with Max, got %v", err)
 	}
 
-	dr := DataResponse{
-		Data: Data{
-			DataType:  raindrops,
+	dr := model.DataResponse{
+		Data: model.Data{
+			DataType:  util.Raindrops,
 			Value:     842,
 			TimeStamp: creationTime.Add(time.Minute * -2),
 		},
-		Category: MapValue(842, 0, 1024, 1, 4),
+		Category: util.MapValue(842, 0, 1024, 1, 4),
 	}
 
 	if !d.Compare(&dr) {
@@ -527,29 +392,29 @@ func TestDB_Min(t *testing.T) {
 
 	creationTime := time.Now().Round(0)
 
-	var objects = [5]Data{
+	var objects = [5]model.Data{
 		{
-			DataType:  soilMoisture,
+			DataType:  util.SoilMoisture,
 			Value:     250,
 			TimeStamp: creationTime.Add(time.Second * -10),
 		},
 		{
-			DataType:  soilMoisture,
+			DataType:  util.SoilMoisture,
 			Value:     307,
 			TimeStamp: creationTime.Add(time.Second * -17),
 		},
 		{
-			DataType:  soilMoisture,
+			DataType:  util.SoilMoisture,
 			Value:     348,
 			TimeStamp: creationTime.Add(time.Second * -2),
 		},
 		{
-			DataType:  soilMoisture,
+			DataType:  util.SoilMoisture,
 			Value:     412,
 			TimeStamp: creationTime.Add(time.Minute * -5),
 		},
 		{
-			DataType:  soilMoisture,
+			DataType:  util.SoilMoisture,
 			Value:     440,
 			TimeStamp: creationTime.Add(time.Minute * -1),
 		},
@@ -559,18 +424,18 @@ func TestDB_Min(t *testing.T) {
 		db.Add(&v)
 	}
 
-	d, err := db.Min(soilMoisture)
+	d, err := db.Min(util.SoilMoisture)
 	if err != nil {
 		t.Fatalf("Expected nil with Min, got %v", err)
 	}
 
-	dr := DataResponse{
-		Data: Data{
-			DataType:  soilMoisture,
+	dr := model.DataResponse{
+		Data: model.Data{
+			DataType:  util.SoilMoisture,
 			Value:     250,
 			TimeStamp: creationTime.Add(time.Second * -10),
 		},
-		Category: MapValue(250, 489, 238, 0, 100),
+		Category: util.MapValue(250, 489, 238, 0, 100),
 	}
 
 	if !d.Compare(&dr) {
