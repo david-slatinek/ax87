@@ -1,6 +1,7 @@
 package main
 
 import (
+	"api/db"
 	"api/env"
 	pb "api/schema"
 	"context"
@@ -22,14 +23,14 @@ func main() {
 		log.Fatalf(err.Error())
 	}
 
-	db := DB{}
-	db.LoadFields()
+	dbb := db.DB{}
+	dbb.LoadFields()
 
-	err = db.Connect()
+	err = dbb.Connect()
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
-	defer db.client.Close()
+	defer dbb.Close()
 
 	listener, err := net.Listen("tcp", ":9000")
 	if err != nil {
@@ -37,7 +38,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	server := Server{dbService: &db}
+	server := Server{dbService: &dbb}
 	pb.RegisterRequestServer(grpcServer, &server)
 
 	c := make(chan os.Signal, 1)

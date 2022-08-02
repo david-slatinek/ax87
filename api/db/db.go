@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"api/models"
@@ -32,6 +32,12 @@ func (db *DB) LoadFields() {
 	db.token = os.Getenv("INFLUXDB_TOKEN")
 	db.org = os.Getenv("ORGANIZATION")
 	db.bucket = os.Getenv("BUCKET")
+}
+
+func (db *DB) Close() {
+	if db.client != nil {
+		db.client.Close()
+	}
 }
 
 // Connect to the influxdb server.

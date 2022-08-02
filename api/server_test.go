@@ -1,6 +1,7 @@
 package main
 
 import (
+	"api/db"
 	"api/env"
 	model "api/models"
 	pb "api/schema"
@@ -15,14 +16,14 @@ import (
 func TestServer_Add(t *testing.T) {
 	_ = env.Load("env/test.env")
 
-	db := DB{}
-	db.LoadFields()
-	_ = db.Connect()
-	defer db.client.Close()
+	dbb := db.DB{}
+	dbb.LoadFields()
+	_ = dbb.Connect()
+	defer dbb.Close()
 
-	_ = db.Init()
+	_ = dbb.Init()
 
-	server := Server{dbService: &db}
+	server := Server{dbService: &dbb}
 
 	d := pb.Data{
 		DataType:  pb.DataType_CARBON_MONOXIDE,
@@ -50,21 +51,21 @@ func TestServer_Add(t *testing.T) {
 func TestServer_Latest(t *testing.T) {
 	_ = env.Load("env/test.env")
 
-	db := DB{}
-	db.LoadFields()
-	_ = db.Connect()
-	defer db.client.Close()
+	dbb := db.DB{}
+	dbb.LoadFields()
+	_ = dbb.Connect()
+	defer dbb.Close()
 
-	_ = db.Init()
+	_ = dbb.Init()
 
 	data := model.Data{
 		DataType:  util.AirQuality,
 		Value:     183,
 		TimeStamp: time.Now().Round(0),
 	}
-	db.Add(&data)
+	dbb.Add(&data)
 
-	server := Server{dbService: &db}
+	server := Server{dbService: &dbb}
 	dc, err := server.Latest(context.Background(), &pb.DataRequest{DataType: pb.DataType_AIR_QUALITY})
 
 	if err != nil {
@@ -85,12 +86,12 @@ func TestServer_Latest(t *testing.T) {
 func TestServer_Last24H(t *testing.T) {
 	_ = env.Load("env/test.env")
 
-	db := DB{}
-	db.LoadFields()
-	_ = db.Connect()
-	defer db.client.Close()
+	dbb := db.DB{}
+	dbb.LoadFields()
+	_ = dbb.Connect()
+	defer dbb.Close()
 
-	_ = db.Init()
+	_ = dbb.Init()
 
 	creationTime := time.Now().Round(0)
 
@@ -161,10 +162,10 @@ func TestServer_Last24H(t *testing.T) {
 	}
 
 	for _, v := range objects {
-		db.Add(&v.data)
+		dbb.Add(&v.data)
 	}
 
-	server := Server{dbService: &db}
+	server := Server{dbService: &dbb}
 
 	dr, err := server.Last24H(context.Background(), &pb.DataRequest{DataType: pb.DataType_RAINDROPS})
 	if err != nil {
@@ -187,12 +188,12 @@ func TestServer_Last24H(t *testing.T) {
 func TestServer_Median(t *testing.T) {
 	_ = env.Load("env/test.env")
 
-	db := DB{}
-	db.LoadFields()
-	_ = db.Connect()
-	defer db.client.Close()
+	dbb := db.DB{}
+	dbb.LoadFields()
+	_ = dbb.Connect()
+	defer dbb.Close()
 
-	_ = db.Init()
+	_ = dbb.Init()
 
 	creationTime := time.Now().Round(0)
 
@@ -225,10 +226,10 @@ func TestServer_Median(t *testing.T) {
 	}
 
 	for _, v := range objects {
-		db.Add(&v)
+		dbb.Add(&v)
 	}
 
-	server := Server{dbService: &db}
+	server := Server{dbService: &dbb}
 
 	dc, err := server.Median(context.Background(), &pb.DataRequest{DataType: pb.DataType_SOIL_MOISTURE})
 	if err != nil {
@@ -255,12 +256,12 @@ func TestServer_Median(t *testing.T) {
 func TestServer_Max(t *testing.T) {
 	_ = env.Load("env/test.env")
 
-	db := DB{}
-	db.LoadFields()
-	_ = db.Connect()
-	defer db.client.Close()
+	dbb := db.DB{}
+	dbb.LoadFields()
+	_ = dbb.Connect()
+	defer dbb.Close()
 
-	_ = db.Init()
+	_ = dbb.Init()
 
 	creationTime := time.Now().Round(0)
 
@@ -293,10 +294,10 @@ func TestServer_Max(t *testing.T) {
 	}
 
 	for _, v := range objects {
-		db.Add(&v)
+		dbb.Add(&v)
 	}
 
-	server := Server{dbService: &db}
+	server := Server{dbService: &dbb}
 
 	dc, err := server.Max(context.Background(), &pb.DataRequest{DataType: pb.DataType_CARBON_MONOXIDE})
 	if err != nil {
@@ -323,12 +324,12 @@ func TestServer_Max(t *testing.T) {
 func TestServer_Min(t *testing.T) {
 	_ = env.Load("env/test.env")
 
-	db := DB{}
-	db.LoadFields()
-	_ = db.Connect()
-	defer db.client.Close()
+	dbb := db.DB{}
+	dbb.LoadFields()
+	_ = dbb.Connect()
+	defer dbb.Close()
 
-	_ = db.Init()
+	_ = dbb.Init()
 
 	creationTime := time.Now().Round(0)
 
@@ -361,10 +362,10 @@ func TestServer_Min(t *testing.T) {
 	}
 
 	for _, v := range objects {
-		db.Add(&v)
+		dbb.Add(&v)
 	}
 
-	server := Server{dbService: &db}
+	server := Server{dbService: &dbb}
 
 	dc, err := server.Min(context.Background(), &pb.DataRequest{DataType: pb.DataType_AIR_QUALITY})
 	if err != nil {

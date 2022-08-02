@@ -1,6 +1,7 @@
-package main
+package db_test
 
 import (
+	"api/db"
 	"api/env"
 	"api/models"
 	"api/util"
@@ -8,53 +9,29 @@ import (
 	"time"
 )
 
-// Test DB.LoadFields.
-func TestDB_LoadFields(t *testing.T) {
-	_ = env.Load("env/test.env")
-
-	db := DB{}
-	db.LoadFields()
-
-	if db.token == "" {
-		t.Error("Empty db.token")
-	}
-
-	if db.url == "" {
-		t.Error("Empty db.url")
-	}
-
-	if db.org == "" {
-		t.Error("Empty db.org")
-	}
-
-	if db.bucket == "" {
-		t.Error("Empty db.bucket")
-	}
-}
-
 // Test DB.Connect.
 func TestDB_Connect(t *testing.T) {
 	_ = env.Load("env/test.env")
 
-	db := DB{}
-	db.LoadFields()
+	dbb := db.DB{}
+	dbb.LoadFields()
 
-	if err := db.Connect(); err != nil {
+	if err := dbb.Connect(); err != nil {
 		t.Fatalf("Expected nil with Connect, got %v", err)
 	}
-	defer db.client.Close()
+	defer dbb.Close()
 }
 
 // Test DB.Init
 func TestDB_Init(t *testing.T) {
 	_ = env.Load("env/test.env")
 
-	db := DB{}
-	db.LoadFields()
-	_ = db.Connect()
-	defer db.client.Close()
+	dbb := db.DB{}
+	dbb.LoadFields()
+	_ = dbb.Connect()
+	defer dbb.Close()
 
-	if err := db.Init(); err != nil {
+	if err := dbb.Init(); err != nil {
 		t.Fatalf("Expected nil with Init, got %v", err)
 	}
 }
@@ -63,12 +40,12 @@ func TestDB_Init(t *testing.T) {
 func TestDB_Latest(t *testing.T) {
 	_ = env.Load("env/test.env")
 
-	db := DB{}
-	db.LoadFields()
-	_ = db.Connect()
-	defer db.client.Close()
+	dbb := db.DB{}
+	dbb.LoadFields()
+	_ = dbb.Connect()
+	defer dbb.Close()
 
-	_ = db.Init()
+	_ = dbb.Init()
 
 	creationTime := time.Now().Round(0)
 
@@ -127,13 +104,13 @@ func TestDB_Latest(t *testing.T) {
 	}
 
 	for _, v := range objects {
-		db.Add(&v.data)
+		dbb.Add(&v.data)
 	}
 
 	types := [4]string{util.CarbonMonoxide, util.AirQuality, util.Raindrops, util.SoilMoisture}
 
 	for k, v := range types {
-		dr, err := db.Latest(v)
+		dr, err := dbb.Latest(v)
 		if err != nil {
 			t.Fatalf("Expected nil with Latest, got %v", err)
 		}
@@ -150,12 +127,12 @@ func TestDB_Latest(t *testing.T) {
 func TestDB_Last24H(t *testing.T) {
 	_ = env.Load("env/test.env")
 
-	db := DB{}
-	db.LoadFields()
-	_ = db.Connect()
-	defer db.client.Close()
+	dbb := db.DB{}
+	dbb.LoadFields()
+	_ = dbb.Connect()
+	defer dbb.Close()
 
-	_ = db.Init()
+	_ = dbb.Init()
 
 	creationTime := time.Now().Round(0)
 
@@ -226,10 +203,10 @@ func TestDB_Last24H(t *testing.T) {
 	}
 
 	for _, v := range objects {
-		db.Add(&v.data)
+		dbb.Add(&v.data)
 	}
 
-	dr, err := db.Last24H(util.CarbonMonoxide)
+	dr, err := dbb.Last24H(util.CarbonMonoxide)
 	if err != nil {
 		t.Fatalf("Expected nil with Last24H, got %v", err)
 	}
@@ -251,12 +228,12 @@ func TestDB_Last24H(t *testing.T) {
 func TestDB_Median(t *testing.T) {
 	_ = env.Load("env/test.env")
 
-	db := DB{}
-	db.LoadFields()
-	_ = db.Connect()
-	defer db.client.Close()
+	dbb := db.DB{}
+	dbb.LoadFields()
+	_ = dbb.Connect()
+	defer dbb.Close()
 
-	_ = db.Init()
+	_ = dbb.Init()
 
 	creationTime := time.Now().Round(0)
 
@@ -289,10 +266,10 @@ func TestDB_Median(t *testing.T) {
 	}
 
 	for _, v := range objects {
-		db.Add(&v)
+		dbb.Add(&v)
 	}
 
-	d, err := db.Median(util.AirQuality)
+	d, err := dbb.Median(util.AirQuality)
 	if err != nil {
 		t.Fatalf("Expected nil with Median, got %v", err)
 	}
@@ -317,12 +294,12 @@ func TestDB_Median(t *testing.T) {
 func TestDB_Max(t *testing.T) {
 	_ = env.Load("env/test.env")
 
-	db := DB{}
-	db.LoadFields()
-	_ = db.Connect()
-	defer db.client.Close()
+	dbb := db.DB{}
+	dbb.LoadFields()
+	_ = dbb.Connect()
+	defer dbb.Close()
 
-	_ = db.Init()
+	_ = dbb.Init()
 
 	creationTime := time.Now().Round(0)
 
@@ -355,10 +332,10 @@ func TestDB_Max(t *testing.T) {
 	}
 
 	for _, v := range objects {
-		db.Add(&v)
+		dbb.Add(&v)
 	}
 
-	d, err := db.Max(util.Raindrops)
+	d, err := dbb.Max(util.Raindrops)
 	if err != nil {
 		t.Fatalf("Expected nil with Max, got %v", err)
 	}
@@ -383,12 +360,12 @@ func TestDB_Max(t *testing.T) {
 func TestDB_Min(t *testing.T) {
 	_ = env.Load("env/test.env")
 
-	db := DB{}
-	db.LoadFields()
-	_ = db.Connect()
-	defer db.client.Close()
+	dbb := db.DB{}
+	dbb.LoadFields()
+	_ = dbb.Connect()
+	defer dbb.Close()
 
-	_ = db.Init()
+	_ = dbb.Init()
 
 	creationTime := time.Now().Round(0)
 
@@ -421,10 +398,10 @@ func TestDB_Min(t *testing.T) {
 	}
 
 	for _, v := range objects {
-		db.Add(&v)
+		dbb.Add(&v)
 	}
 
-	d, err := db.Min(util.SoilMoisture)
+	d, err := dbb.Min(util.SoilMoisture)
 	if err != nil {
 		t.Fatalf("Expected nil with Min, got %v", err)
 	}

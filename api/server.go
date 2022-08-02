@@ -1,6 +1,7 @@
 package main
 
 import (
+	"api/db"
 	"api/models"
 	pb "api/schema"
 	"context"
@@ -10,7 +11,7 @@ import (
 type Server struct {
 	pb.UnimplementedRequestServer
 	// DB field.
-	dbService *DB
+	dbService *db.DB
 }
 
 // Add new data to the db.
