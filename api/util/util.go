@@ -14,6 +14,9 @@ const (
 	Raindrops = "RAINDROPS"
 	// SoilMoisture constant.
 	SoilMoisture = "SOIL_MOISTURE"
+
+	// EnvTestFilePath location for test.env.
+	EnvTestFilePath = "../env/test.env"
 )
 
 // MapCO2 value to 7 categories, with 1 being the best.

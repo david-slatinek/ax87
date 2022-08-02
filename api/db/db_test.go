@@ -11,7 +11,7 @@ import (
 
 // Test DB.Connect.
 func TestDB_Connect(t *testing.T) {
-	_ = env.Load("env/test.env")
+	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
 	dbb.LoadFields()
@@ -24,7 +24,7 @@ func TestDB_Connect(t *testing.T) {
 
 // Test DB.Init.
 func TestDB_Init(t *testing.T) {
-	_ = env.Load("env/test.env")
+	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
 	dbb.LoadFields()
@@ -38,7 +38,7 @@ func TestDB_Init(t *testing.T) {
 
 // Test DB.Latest.
 func TestDB_Latest(t *testing.T) {
-	_ = env.Load("env/test.env")
+	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
 	dbb.LoadFields()
@@ -125,7 +125,7 @@ func TestDB_Latest(t *testing.T) {
 
 // Test DB.Last24H.
 func TestDB_Last24H(t *testing.T) {
-	_ = env.Load("env/test.env")
+	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
 	dbb.LoadFields()
@@ -226,7 +226,7 @@ func TestDB_Last24H(t *testing.T) {
 
 // Test DB.Median.
 func TestDB_Median(t *testing.T) {
-	_ = env.Load("env/test.env")
+	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
 	dbb.LoadFields()
@@ -292,7 +292,7 @@ func TestDB_Median(t *testing.T) {
 
 // Test DB.Max.
 func TestDB_Max(t *testing.T) {
-	_ = env.Load("env/test.env")
+	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
 	dbb.LoadFields()
@@ -358,7 +358,7 @@ func TestDB_Max(t *testing.T) {
 
 // Test DB.Min.
 func TestDB_Min(t *testing.T) {
-	_ = env.Load("env/test.env")
+	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
 	dbb.LoadFields()
