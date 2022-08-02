@@ -1,10 +1,11 @@
-package main
+package server_test
 
 import (
 	"api/db"
 	"api/env"
 	model "api/models"
 	pb "api/schema"
+	"api/server"
 	"api/util"
 	"context"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -23,7 +24,7 @@ func TestServer_Add(t *testing.T) {
 
 	_ = dbb.Init()
 
-	server := Server{dbService: &dbb}
+	srv := server.Server{DBService: &dbb}
 
 	d := pb.Data{
 		DataType:  pb.DataType_CARBON_MONOXIDE,
@@ -31,7 +32,7 @@ func TestServer_Add(t *testing.T) {
 		Timestamp: timestamppb.New(time.Now()),
 	}
 
-	reply, err := server.Add(context.Background(), &d)
+	reply, err := srv.Add(context.Background(), &d)
 
 	if err != nil {
 		t.Fatalf("Expected nil with Server.Add, got %v", err)
@@ -65,8 +66,8 @@ func TestServer_Latest(t *testing.T) {
 	}
 	dbb.Add(&data)
 
-	server := Server{dbService: &dbb}
-	dc, err := server.Latest(context.Background(), &pb.DataRequest{DataType: pb.DataType_AIR_QUALITY})
+	srv := server.Server{DBService: &dbb}
+	dc, err := srv.Latest(context.Background(), &pb.DataRequest{DataType: pb.DataType_AIR_QUALITY})
 
 	if err != nil {
 		t.Fatalf("Expected nil with Server.Latest, got %v", err)
@@ -165,9 +166,9 @@ func TestServer_Last24H(t *testing.T) {
 		dbb.Add(&v.data)
 	}
 
-	server := Server{dbService: &dbb}
+	srv := server.Server{DBService: &dbb}
 
-	dr, err := server.Last24H(context.Background(), &pb.DataRequest{DataType: pb.DataType_RAINDROPS})
+	dr, err := srv.Last24H(context.Background(), &pb.DataRequest{DataType: pb.DataType_RAINDROPS})
 	if err != nil {
 		t.Fatalf("Expected nil with Last24H, got %v", err)
 	}
@@ -229,9 +230,9 @@ func TestServer_Median(t *testing.T) {
 		dbb.Add(&v)
 	}
 
-	server := Server{dbService: &dbb}
+	srv := server.Server{DBService: &dbb}
 
-	dc, err := server.Median(context.Background(), &pb.DataRequest{DataType: pb.DataType_SOIL_MOISTURE})
+	dc, err := srv.Median(context.Background(), &pb.DataRequest{DataType: pb.DataType_SOIL_MOISTURE})
 	if err != nil {
 		t.Fatalf("Expected nil with Median, got %v", err)
 	}
@@ -297,9 +298,9 @@ func TestServer_Max(t *testing.T) {
 		dbb.Add(&v)
 	}
 
-	server := Server{dbService: &dbb}
+	srv := server.Server{DBService: &dbb}
 
-	dc, err := server.Max(context.Background(), &pb.DataRequest{DataType: pb.DataType_CARBON_MONOXIDE})
+	dc, err := srv.Max(context.Background(), &pb.DataRequest{DataType: pb.DataType_CARBON_MONOXIDE})
 	if err != nil {
 		t.Fatalf("Expected nil with Max, got %v", err)
 	}
@@ -365,9 +366,9 @@ func TestServer_Min(t *testing.T) {
 		dbb.Add(&v)
 	}
 
-	server := Server{dbService: &dbb}
+	srv := server.Server{DBService: &dbb}
 
-	dc, err := server.Min(context.Background(), &pb.DataRequest{DataType: pb.DataType_AIR_QUALITY})
+	dc, err := srv.Min(context.Background(), &pb.DataRequest{DataType: pb.DataType_AIR_QUALITY})
 	if err != nil {
 		t.Fatalf("Expected nil with Min, got %v", err)
 	}

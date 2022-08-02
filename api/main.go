@@ -4,6 +4,7 @@ import (
 	"api/db"
 	"api/env"
 	pb "api/schema"
+	"api/server"
 	"context"
 	"google.golang.org/grpc"
 	"log"
@@ -38,8 +39,8 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	server := Server{dbService: &dbb}
-	pb.RegisterRequestServer(grpcServer, &server)
+	srv := server.Server{DBService: &dbb}
+	pb.RegisterRequestServer(grpcServer, &srv)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
