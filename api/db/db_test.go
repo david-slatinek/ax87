@@ -3,7 +3,7 @@ package db_test
 import (
 	"api/db"
 	"api/env"
-	"api/models"
+	"api/model"
 	"api/util"
 	"testing"
 	"time"
@@ -56,48 +56,48 @@ func TestDB_Latest(t *testing.T) {
 		{model.Data{
 			DataType:  util.CarbonMonoxide,
 			Value:     45,
-			TimeStamp: creationTime,
+			Timestamp: creationTime,
 		}, model.DataResponse{
 			Data: model.Data{
 				DataType:  util.CarbonMonoxide,
 				Value:     45,
-				TimeStamp: creationTime,
+				Timestamp: creationTime,
 			},
 			Category: util.MapCO2(45),
 		}},
 		{model.Data{
 			DataType:  util.AirQuality,
 			Value:     125,
-			TimeStamp: creationTime,
+			Timestamp: creationTime,
 		}, model.DataResponse{
 			Data: model.Data{
 				DataType:  util.AirQuality,
 				Value:     125,
-				TimeStamp: creationTime,
+				Timestamp: creationTime,
 			},
 			Category: util.MapAir(125),
 		}},
 		{model.Data{
 			DataType:  util.Raindrops,
 			Value:     800,
-			TimeStamp: creationTime,
+			Timestamp: creationTime,
 		}, model.DataResponse{
 			Data: model.Data{
 				DataType:  util.Raindrops,
 				Value:     800,
-				TimeStamp: creationTime,
+				Timestamp: creationTime,
 			},
 			Category: util.MapValue(800, 0, 1024, 1, 4),
 		}},
 		{model.Data{
 			DataType:  util.SoilMoisture,
 			Value:     400,
-			TimeStamp: creationTime,
+			Timestamp: creationTime,
 		}, model.DataResponse{
 			Data: model.Data{
 				DataType:  util.SoilMoisture,
 				Value:     400,
-				TimeStamp: creationTime,
+				Timestamp: creationTime,
 			},
 			Category: util.MapValue(400, 489, 238, 0, 100),
 		}},
@@ -115,7 +115,7 @@ func TestDB_Latest(t *testing.T) {
 			t.Fatalf("Expected nil with Latest, got %v", err)
 		}
 
-		if !dr.Compare(&objects[k].expected) {
+		if !dr.Equals(&objects[k].expected) {
 			t.Error("Objects are not the same")
 			t.Errorf("Expected: %v", objects[k].expected)
 			t.Errorf("Result: %v", dr)
@@ -143,60 +143,60 @@ func TestDB_Last24H(t *testing.T) {
 		{model.Data{
 			DataType:  util.CarbonMonoxide,
 			Value:     250,
-			TimeStamp: creationTime,
+			Timestamp: creationTime,
 		}, model.DataResponse{
 			Data: model.Data{
 				DataType:  util.CarbonMonoxide,
 				Value:     250,
-				TimeStamp: creationTime,
+				Timestamp: creationTime,
 			},
 			Category: util.MapCO2(250),
 		}},
 		{model.Data{
 			DataType:  util.CarbonMonoxide,
 			Value:     55,
-			TimeStamp: creationTime.Add(time.Second * -1),
+			Timestamp: creationTime.Add(time.Second * -1),
 		}, model.DataResponse{
 			Data: model.Data{
 				DataType:  util.CarbonMonoxide,
 				Value:     55,
-				TimeStamp: creationTime.Add(time.Second * -1),
+				Timestamp: creationTime.Add(time.Second * -1),
 			},
 			Category: util.MapCO2(55),
 		}},
 		{model.Data{
 			DataType:  util.CarbonMonoxide,
 			Value:     420,
-			TimeStamp: creationTime.Add(time.Second * -10),
+			Timestamp: creationTime.Add(time.Second * -10),
 		}, model.DataResponse{
 			Data: model.Data{
 				DataType:  util.CarbonMonoxide,
 				Value:     420,
-				TimeStamp: creationTime.Add(time.Second * -10),
+				Timestamp: creationTime.Add(time.Second * -10),
 			},
 			Category: util.MapCO2(420),
 		}},
 		{model.Data{
 			DataType:  util.CarbonMonoxide,
 			Value:     69,
-			TimeStamp: creationTime.Add(time.Minute * -1),
+			Timestamp: creationTime.Add(time.Minute * -1),
 		}, model.DataResponse{
 			Data: model.Data{
 				DataType:  util.CarbonMonoxide,
 				Value:     69,
-				TimeStamp: creationTime.Add(time.Minute * -1),
+				Timestamp: creationTime.Add(time.Minute * -1),
 			},
 			Category: util.MapCO2(69),
 		}},
 		{model.Data{
 			DataType:  util.CarbonMonoxide,
 			Value:     170,
-			TimeStamp: creationTime.Add(time.Minute * -2),
+			Timestamp: creationTime.Add(time.Minute * -2),
 		}, model.DataResponse{
 			Data: model.Data{
 				DataType:  util.CarbonMonoxide,
 				Value:     170,
-				TimeStamp: creationTime.Add(time.Minute * -2),
+				Timestamp: creationTime.Add(time.Minute * -2),
 			},
 			Category: util.MapCO2(170),
 		}},
@@ -216,7 +216,7 @@ func TestDB_Last24H(t *testing.T) {
 	}
 
 	for k, v := range *dr {
-		if !v.Compare(&objects[k].expected) {
+		if !v.Equals(&objects[k].expected) {
 			t.Error("Objects are not the same")
 			t.Errorf("Expected: %v", objects[k].expected)
 			t.Errorf("Result: %v", v)
@@ -241,27 +241,27 @@ func TestDB_Median(t *testing.T) {
 		{
 			DataType:  util.AirQuality,
 			Value:     140,
-			TimeStamp: creationTime.Add(time.Minute * -2),
+			Timestamp: creationTime.Add(time.Minute * -2),
 		},
 		{
 			DataType:  util.AirQuality,
 			Value:     205,
-			TimeStamp: creationTime.Add(time.Second * -2),
+			Timestamp: creationTime.Add(time.Second * -2),
 		},
 		{
 			DataType:  util.AirQuality,
 			Value:     270,
-			TimeStamp: creationTime.Add(time.Second * -5),
+			Timestamp: creationTime.Add(time.Second * -5),
 		},
 		{
 			DataType:  util.AirQuality,
 			Value:     33,
-			TimeStamp: creationTime.Add(time.Second * -21),
+			Timestamp: creationTime.Add(time.Second * -21),
 		},
 		{
 			DataType:  util.AirQuality,
 			Value:     195,
-			TimeStamp: creationTime.Add(time.Minute * -1),
+			Timestamp: creationTime.Add(time.Minute * -1),
 		},
 	}
 
@@ -278,12 +278,12 @@ func TestDB_Median(t *testing.T) {
 		Data: model.Data{
 			DataType:  util.AirQuality,
 			Value:     195,
-			TimeStamp: creationTime.Add(time.Minute * -1),
+			Timestamp: creationTime.Add(time.Minute * -1),
 		},
 		Category: util.MapAir(195),
 	}
 
-	if !d.Compare(&dr) {
+	if !d.Equals(&dr) {
 		t.Error("Objects are not the same")
 		t.Errorf("Expected: %v", dr)
 		t.Errorf("Result: %v", d)
@@ -307,27 +307,27 @@ func TestDB_Max(t *testing.T) {
 		{
 			DataType:  util.Raindrops,
 			Value:     230,
-			TimeStamp: creationTime.Add(time.Minute * -1),
+			Timestamp: creationTime.Add(time.Minute * -1),
 		},
 		{
 			DataType:  util.Raindrops,
 			Value:     420,
-			TimeStamp: creationTime.Add(time.Second * -3),
+			Timestamp: creationTime.Add(time.Second * -3),
 		},
 		{
 			DataType:  util.Raindrops,
 			Value:     114,
-			TimeStamp: creationTime.Add(time.Second * -7),
+			Timestamp: creationTime.Add(time.Second * -7),
 		},
 		{
 			DataType:  util.Raindrops,
 			Value:     47,
-			TimeStamp: creationTime.Add(time.Second * -41),
+			Timestamp: creationTime.Add(time.Second * -41),
 		},
 		{
 			DataType:  util.Raindrops,
 			Value:     842,
-			TimeStamp: creationTime.Add(time.Minute * -2),
+			Timestamp: creationTime.Add(time.Minute * -2),
 		},
 	}
 
@@ -344,12 +344,12 @@ func TestDB_Max(t *testing.T) {
 		Data: model.Data{
 			DataType:  util.Raindrops,
 			Value:     842,
-			TimeStamp: creationTime.Add(time.Minute * -2),
+			Timestamp: creationTime.Add(time.Minute * -2),
 		},
 		Category: util.MapValue(842, 0, 1024, 1, 4),
 	}
 
-	if !d.Compare(&dr) {
+	if !d.Equals(&dr) {
 		t.Error("Objects are not the same")
 		t.Errorf("Expected: %v", dr)
 		t.Errorf("Result: %v", d)
@@ -373,27 +373,27 @@ func TestDB_Min(t *testing.T) {
 		{
 			DataType:  util.SoilMoisture,
 			Value:     250,
-			TimeStamp: creationTime.Add(time.Second * -10),
+			Timestamp: creationTime.Add(time.Second * -10),
 		},
 		{
 			DataType:  util.SoilMoisture,
 			Value:     307,
-			TimeStamp: creationTime.Add(time.Second * -17),
+			Timestamp: creationTime.Add(time.Second * -17),
 		},
 		{
 			DataType:  util.SoilMoisture,
 			Value:     348,
-			TimeStamp: creationTime.Add(time.Second * -2),
+			Timestamp: creationTime.Add(time.Second * -2),
 		},
 		{
 			DataType:  util.SoilMoisture,
 			Value:     412,
-			TimeStamp: creationTime.Add(time.Minute * -5),
+			Timestamp: creationTime.Add(time.Minute * -5),
 		},
 		{
 			DataType:  util.SoilMoisture,
 			Value:     440,
-			TimeStamp: creationTime.Add(time.Minute * -1),
+			Timestamp: creationTime.Add(time.Minute * -1),
 		},
 	}
 
@@ -410,12 +410,12 @@ func TestDB_Min(t *testing.T) {
 		Data: model.Data{
 			DataType:  util.SoilMoisture,
 			Value:     250,
-			TimeStamp: creationTime.Add(time.Second * -10),
+			Timestamp: creationTime.Add(time.Second * -10),
 		},
 		Category: util.MapValue(250, 489, 238, 0, 100),
 	}
 
-	if !d.Compare(&dr) {
+	if !d.Equals(&dr) {
 		t.Error("Objects are not the same")
 		t.Errorf("Expected: %v", dr)
 		t.Errorf("Result: %v", d)

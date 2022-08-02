@@ -1,7 +1,7 @@
 package db
 
 import (
-	"api/models"
+	"api/model"
 	"api/util"
 	"context"
 	"errors"
@@ -34,6 +34,7 @@ func (db *DB) LoadFields() {
 	db.bucket = os.Getenv("BUCKET")
 }
 
+// Close db connection.
 func (db *DB) Close() {
 	if db.client != nil {
 		db.client.Close()
@@ -97,7 +98,7 @@ func (db *DB) Add(data *model.Data) {
 		return
 	}
 	writeAPI := db.client.WriteAPI(db.org, db.bucket)
-	p := influxdb2.NewPointWithMeasurement(data.DataType).AddField("value", data.Value).SetTime(data.TimeStamp.Round(0))
+	p := influxdb2.NewPointWithMeasurement(data.DataType).AddField("value", data.Value).SetTime(data.Timestamp.Round(0))
 
 	switch data.DataType {
 	case util.Raindrops:
@@ -166,7 +167,7 @@ func (db *DB) Latest(dataType string) (*model.DataResponse, error) {
 	}
 
 	dr.DataType = result.Record().Measurement()
-	dr.TimeStamp = result.Record().Time().Local()
+	dr.Timestamp = result.Record().Time().Local()
 
 	return &dr, nil
 }
@@ -226,7 +227,7 @@ func (db *DB) Last24H(dataType string) (*[]model.DataResponse, error) {
 			Data: model.Data{
 				DataType:  dataType,
 				Value:     values[index],
-				TimeStamp: tm[index],
+				Timestamp: tm[index],
 			},
 			Category: value,
 		})
@@ -269,7 +270,7 @@ func (db *DB) RetrieveData(query, dataType string) (*model.DataResponse, error) 
 	}
 
 	dr.DataType = result.Record().Measurement()
-	dr.TimeStamp = result.Record().Time().Local()
+	dr.Timestamp = result.Record().Time().Local()
 	dr.Category = util.GetCategory(int(dr.Value), dataType)
 
 	return &dr, nil

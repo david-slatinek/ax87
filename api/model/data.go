@@ -15,12 +15,12 @@ type Data struct {
 	// Sensor value.
 	Value float32
 	// When was the Value taken.
-	TimeStamp time.Time
+	Timestamp time.Time
 }
 
 // String returns Data fields in a string.
 func (d *Data) String() string {
-	return fmt.Sprintf("DataType: %s, Value: %f, Time: %v", d.DataType, d.Value, d.TimeStamp)
+	return fmt.Sprintf("DataType: %s, Value: %f, Time: %v", d.DataType, d.Value, d.Timestamp)
 }
 
 // Convert Data to pb.Data.
@@ -28,7 +28,7 @@ func (d *Data) Convert() *pb.Data {
 	return &pb.Data{
 		DataType:  pb.DataType(pb.DataType_value[d.DataType]),
 		Value:     d.Value,
-		Timestamp: timestamppb.New(d.TimeStamp),
+		Timestamp: timestamppb.New(d.Timestamp),
 	}
 }
 
@@ -40,7 +40,7 @@ func (d *Data) ConvertToDC() *pb.DataWithCategory {
 	}
 }
 
-// Compare two Data structures.
-func (d *Data) Compare(b *Data) bool {
-	return d.DataType == b.DataType && d.Value == b.Value && d.TimeStamp.Equal(b.TimeStamp)
+// Equals compares two Data structures.
+func (d *Data) Equals(b *Data) bool {
+	return d.DataType == b.DataType && d.Value == b.Value && d.Timestamp.Equal(b.Timestamp)
 }

@@ -25,13 +25,13 @@ func (dr *DataResponse) Convert() *pb.DataWithCategory {
 		Data: &pb.Data{
 			DataType:  pb.DataType(pb.DataType_value[dr.DataType]),
 			Value:     dr.Value,
-			Timestamp: timestamppb.New(dr.TimeStamp),
+			Timestamp: timestamppb.New(dr.Timestamp),
 		},
 		Category: int32(dr.Category),
 	}
 }
 
-// Compare two DataResponse structures.
-func (dr *DataResponse) Compare(b *DataResponse) bool {
-	return dr.DataType == b.DataType && dr.Value == b.Value && dr.TimeStamp.Equal(b.TimeStamp) && dr.Category == b.Category
+// Equals compares two DataResponse structures.
+func (dr *DataResponse) Equals(b *DataResponse) bool {
+	return dr.DataType == b.DataType && dr.Value == b.Value && dr.Timestamp.Equal(b.Timestamp) && dr.Category == b.Category
 }

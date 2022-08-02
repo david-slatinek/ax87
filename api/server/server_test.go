@@ -3,7 +3,7 @@ package server_test
 import (
 	"api/db"
 	"api/env"
-	model "api/models"
+	"api/model"
 	pb "api/schema"
 	"api/server"
 	"api/util"
@@ -62,7 +62,7 @@ func TestServer_Latest(t *testing.T) {
 	data := model.Data{
 		DataType:  util.AirQuality,
 		Value:     183,
-		TimeStamp: time.Now().Round(0),
+		Timestamp: time.Now().Round(0),
 	}
 	dbb.Add(&data)
 
@@ -103,7 +103,7 @@ func TestServer_Last24H(t *testing.T) {
 		{model.Data{
 			DataType:  util.Raindrops,
 			Value:     77,
-			TimeStamp: creationTime,
+			Timestamp: creationTime,
 		}, pb.DataWithCategory{
 			Data: &pb.Data{
 				DataType:  pb.DataType_RAINDROPS,
@@ -115,7 +115,7 @@ func TestServer_Last24H(t *testing.T) {
 		{model.Data{
 			DataType:  util.Raindrops,
 			Value:     87,
-			TimeStamp: creationTime.Add(time.Second * -5),
+			Timestamp: creationTime.Add(time.Second * -5),
 		}, pb.DataWithCategory{
 			Data: &pb.Data{
 				DataType:  pb.DataType_RAINDROPS,
@@ -127,7 +127,7 @@ func TestServer_Last24H(t *testing.T) {
 		{model.Data{
 			DataType:  util.Raindrops,
 			Value:     224,
-			TimeStamp: creationTime.Add(time.Minute * -10),
+			Timestamp: creationTime.Add(time.Minute * -10),
 		}, pb.DataWithCategory{
 			Data: &pb.Data{
 				DataType:  pb.DataType_RAINDROPS,
@@ -139,7 +139,7 @@ func TestServer_Last24H(t *testing.T) {
 		{model.Data{
 			DataType:  util.Raindrops,
 			Value:     400,
-			TimeStamp: creationTime.Add(time.Hour * -7),
+			Timestamp: creationTime.Add(time.Hour * -7),
 		}, pb.DataWithCategory{
 			Data: &pb.Data{
 				DataType:  pb.DataType_RAINDROPS,
@@ -151,7 +151,7 @@ func TestServer_Last24H(t *testing.T) {
 		{model.Data{
 			DataType:  util.Raindrops,
 			Value:     21,
-			TimeStamp: creationTime.Add(time.Hour * -12),
+			Timestamp: creationTime.Add(time.Hour * -12),
 		}, pb.DataWithCategory{
 			Data: &pb.Data{
 				DataType:  pb.DataType_RAINDROPS,
@@ -202,27 +202,27 @@ func TestServer_Median(t *testing.T) {
 		{
 			DataType:  util.SoilMoisture,
 			Value:     222,
-			TimeStamp: creationTime.Add(time.Minute * -3),
+			Timestamp: creationTime.Add(time.Minute * -3),
 		},
 		{
 			DataType:  util.SoilMoisture,
 			Value:     312,
-			TimeStamp: creationTime.Add(time.Second * -4),
+			Timestamp: creationTime.Add(time.Second * -4),
 		},
 		{
 			DataType:  util.SoilMoisture,
 			Value:     294,
-			TimeStamp: creationTime.Add(time.Second * -5),
+			Timestamp: creationTime.Add(time.Second * -5),
 		},
 		{
 			DataType:  util.SoilMoisture,
 			Value:     431,
-			TimeStamp: creationTime.Add(time.Hour * -17),
+			Timestamp: creationTime.Add(time.Hour * -17),
 		},
 		{
 			DataType:  util.SoilMoisture,
 			Value:     401,
-			TimeStamp: creationTime.Add(time.Hour * -1),
+			Timestamp: creationTime.Add(time.Hour * -1),
 		},
 	}
 
@@ -270,27 +270,27 @@ func TestServer_Max(t *testing.T) {
 		{
 			DataType:  util.CarbonMonoxide,
 			Value:     65,
-			TimeStamp: creationTime.Add(time.Minute * -2),
+			Timestamp: creationTime.Add(time.Minute * -2),
 		},
 		{
 			DataType:  util.CarbonMonoxide,
 			Value:     741,
-			TimeStamp: creationTime.Add(time.Second * -45),
+			Timestamp: creationTime.Add(time.Second * -45),
 		},
 		{
 			DataType:  util.CarbonMonoxide,
 			Value:     132,
-			TimeStamp: creationTime.Add(time.Minute * -22),
+			Timestamp: creationTime.Add(time.Minute * -22),
 		},
 		{
 			DataType:  util.CarbonMonoxide,
 			Value:     387,
-			TimeStamp: creationTime.Add(time.Hour * -3),
+			Timestamp: creationTime.Add(time.Hour * -3),
 		},
 		{
 			DataType:  util.CarbonMonoxide,
 			Value:     25,
-			TimeStamp: creationTime.Add(time.Minute * -37),
+			Timestamp: creationTime.Add(time.Minute * -37),
 		},
 	}
 
@@ -338,27 +338,27 @@ func TestServer_Min(t *testing.T) {
 		{
 			DataType:  util.AirQuality,
 			Value:     33,
-			TimeStamp: creationTime.Add(time.Second * -2),
+			Timestamp: creationTime.Add(time.Second * -2),
 		},
 		{
 			DataType:  util.AirQuality,
 			Value:     331,
-			TimeStamp: creationTime.Add(time.Hour * -4),
+			Timestamp: creationTime.Add(time.Hour * -4),
 		},
 		{
 			DataType:  util.AirQuality,
 			Value:     363,
-			TimeStamp: creationTime.Add(time.Minute * -35),
+			Timestamp: creationTime.Add(time.Minute * -35),
 		},
 		{
 			DataType:  util.AirQuality,
 			Value:     182,
-			TimeStamp: creationTime.Add(time.Hour * -7),
+			Timestamp: creationTime.Add(time.Hour * -7),
 		},
 		{
 			DataType:  util.AirQuality,
 			Value:     167,
-			TimeStamp: creationTime.Add(time.Second * -37),
+			Timestamp: creationTime.Add(time.Second * -37),
 		},
 	}
 

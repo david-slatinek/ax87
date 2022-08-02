@@ -2,7 +2,7 @@ package server
 
 import (
 	"api/db"
-	"api/models"
+	"api/model"
 	pb "api/schema"
 	"context"
 	"errors"
@@ -23,7 +23,7 @@ func (server *Server) Add(_ context.Context, data *pb.Data) (*pb.Reply, error) {
 	d := model.Data{
 		DataType:  data.GetDataType().String(),
 		Value:     data.GetValue(),
-		TimeStamp: data.GetTimestamp().AsTime(),
+		Timestamp: data.GetTimestamp().AsTime(),
 	}
 	server.DBService.Add(&d)
 	return &pb.Reply{}, nil
