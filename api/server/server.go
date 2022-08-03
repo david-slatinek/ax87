@@ -69,7 +69,7 @@ func (server *Server) AddToCache(dr *model.DataResponse) error {
 	if server.client != nil {
 		return server.client.Set(context.Background(), dr.DataType, dr, time.Minute*5).Err()
 	}
-	return nil
+	return errors.New("server.client is nil")
 }
 
 // Latest returns the latest data for the requested dataType.

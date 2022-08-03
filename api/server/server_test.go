@@ -25,6 +25,7 @@ func TestServer_Add(t *testing.T) {
 	_ = dbb.Init()
 
 	srv := server.Server{DBService: &dbb}
+	srv.CreateClient()
 
 	d := pb.Data{
 		DataType:  pb.DataType_CARBON_MONOXIDE,
@@ -48,6 +49,34 @@ func TestServer_Add(t *testing.T) {
 	}
 }
 
+func TestServer_AddToCache(t *testing.T) {
+	_ = env.Load(util.EnvTestFilePath)
+
+	dbb := db.DB{}
+	dbb.LoadFields()
+	_ = dbb.Connect()
+	defer dbb.Close()
+
+	_ = dbb.Init()
+
+	data := model.DataResponse{
+		Data: model.Data{
+			DataType:  util.Raindrops,
+			Value:     500,
+			Timestamp: time.Now(),
+		},
+		Category: util.GetCategory(500, util.Raindrops),
+	}
+
+	srv := server.Server{DBService: &dbb}
+	srv.CreateClient()
+
+	err := srv.AddToCache(&data)
+	if err != nil {
+		t.Fatalf("Expected nil with Server.AddToCache, got %v", err)
+	}
+}
+
 // Test Server.Latest.
 func TestServer_Latest(t *testing.T) {
 	_ = env.Load(util.EnvTestFilePath)
@@ -67,6 +96,8 @@ func TestServer_Latest(t *testing.T) {
 	dbb.Add(&data)
 
 	srv := server.Server{DBService: &dbb}
+	srv.CreateClient()
+
 	dc, err := srv.Latest(context.Background(), &pb.DataRequest{DataType: pb.DataType_AIR_QUALITY})
 
 	if err != nil {
@@ -167,6 +198,7 @@ func TestServer_Last24H(t *testing.T) {
 	}
 
 	srv := server.Server{DBService: &dbb}
+	srv.CreateClient()
 
 	dr, err := srv.Last24H(context.Background(), &pb.DataRequest{DataType: pb.DataType_RAINDROPS})
 	if err != nil {
@@ -232,6 +264,7 @@ func TestServer_Median(t *testing.T) {
 	}
 
 	srv := server.Server{DBService: &dbb}
+	srv.CreateClient()
 
 	dc, err := srv.Median(context.Background(), &pb.DataRequest{DataType: pb.DataType_SOIL_MOISTURE})
 	if err != nil {
@@ -300,6 +333,7 @@ func TestServer_Max(t *testing.T) {
 	}
 
 	srv := server.Server{DBService: &dbb}
+	srv.CreateClient()
 
 	dc, err := srv.Max(context.Background(), &pb.DataRequest{DataType: pb.DataType_CARBON_MONOXIDE})
 	if err != nil {
@@ -368,6 +402,7 @@ func TestServer_Min(t *testing.T) {
 	}
 
 	srv := server.Server{DBService: &dbb}
+	srv.CreateClient()
 
 	dc, err := srv.Min(context.Background(), &pb.DataRequest{DataType: pb.DataType_AIR_QUALITY})
 	if err != nil {
