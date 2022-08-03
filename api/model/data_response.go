@@ -2,6 +2,7 @@ package model
 
 import (
 	pb "api/schema"
+	"encoding/json"
 	"fmt"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -11,7 +12,7 @@ type DataResponse struct {
 	// Embedded Data struct.
 	Data
 	// Data.Value category. Check functions util.GetCategory.
-	Category int
+	Category int `json:"category"`
 }
 
 // String returns DataResponse fields in a string.
@@ -34,4 +35,8 @@ func (dr *DataResponse) Convert() *pb.DataWithCategory {
 // Equals compares two DataResponse structures.
 func (dr *DataResponse) Equals(b *DataResponse) bool {
 	return dr.DataType == b.DataType && dr.Value == b.Value && dr.Timestamp.Equal(b.Timestamp) && dr.Category == b.Category
+}
+
+func (dr DataResponse) MarshalBinary() ([]byte, error) {
+	return json.Marshal(dr)
 }

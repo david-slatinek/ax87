@@ -40,6 +40,7 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 	srv := server.Server{DBService: &dbb}
+	srv.CreateClient()
 	pb.RegisterRequestServer(grpcServer, &srv)
 
 	c := make(chan os.Signal, 1)
