@@ -1,6 +1,7 @@
 package server
 
 import (
+	"api/cache"
 	"api/db"
 	"api/model"
 	pb "api/schema"
@@ -8,9 +9,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/go-redis/redis/v9"
 	"log"
-	"time"
 )
 
 // Server is a struct that acts as an intermediate layer between db.DB and grpc default server.
@@ -18,24 +17,32 @@ type Server struct {
 	pb.UnimplementedRequestServer
 	// db.DB field.
 	DBService *db.DB
-	// Redis cache client.
-	client *redis.Client
+	// Redis cache cache.
+	cache *cache.Cache
 }
 
-// CreateClient creates server cache client.
-func (server *Server) CreateClient() {
-	server.client = redis.NewClient(&redis.Options{
-		Addr:            "localhost:6379",
-		Password:        "",
-		DB:              0,
-		MaxRetries:      5,
-		MinRetryBackoff: time.Millisecond * 15,
-	})
+// CreateCache creates server cache.
+func (server *Server) CreateCache() {
+	ca := cache.Cache{}
+	ca.Load()
+	err := ca.Create()
 
-	_, err := server.client.Ping(context.Background()).Result()
-	if err != nil {
-		log.Printf("Invalid cache client, error: %v", err)
-		server.client = nil
+	if err == nil {
+		server.cache = &ca
+	} else {
+		log.Printf("Invalid cache, error: %v", err)
+		server.cache = nil
+	}
+}
+
+// Close db, redis connection.
+func (server *Server) Close() {
+	server.DBService.Close()
+
+	if server.cache != nil {
+		if err := server.cache.Close(); err != nil {
+			log.Printf("Error with cache.Close, error: %v", err)
+		}
 	}
 }
 
@@ -62,18 +69,18 @@ func (server *Server) Add(_ context.Context, data *pb.Data) (*pb.Reply, error) {
 	})
 
 	if err != nil {
-		log.Printf("Error with cache set, error: %v", err)
+		log.Printf("Error with cache add, error: %v", err)
 	}
 
 	return &pb.Reply{}, nil
 }
 
-// AddToCache adds model.DataResponse object to cache.
+// AddToCache adds model.DataResponse object to the cache.
 func (server *Server) AddToCache(dr *model.DataResponse) error {
-	if server.client != nil {
-		return server.client.Set(context.Background(), dr.DataType, dr, time.Minute*5).Err()
+	if server.cache != nil {
+		return server.cache.Add(dr)
 	}
-	return errors.New("server.client is nil")
+	return errors.New("server.cache is nil")
 }
 
 // Latest returns the latest data for the requested dataType.
@@ -85,8 +92,8 @@ func (server *Server) Latest(_ context.Context, request *pb.DataRequest) (*pb.Da
 	var latest *model.DataResponse
 	var ok = false
 
-	if server.client != nil {
-		value, err := server.client.Get(context.Background(), request.DataType.String()).Result()
+	if server.cache != nil {
+		value, err := server.cache.Get(request.DataType.String())
 
 		if err != nil {
 			log.Printf("Error with cache get, error: %v", err)

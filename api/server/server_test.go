@@ -18,14 +18,14 @@ func TestServer_Add(t *testing.T) {
 	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
-	dbb.LoadFields()
+	dbb.Load()
 	_ = dbb.Connect()
 	defer dbb.Close()
 
 	_ = dbb.Init()
 
 	srv := server.Server{DBService: &dbb}
-	srv.CreateClient()
+	srv.CreateCache()
 
 	d := pb.Data{
 		DataType:  pb.DataType_CARBON_MONOXIDE,
@@ -53,7 +53,7 @@ func TestServer_AddToCache(t *testing.T) {
 	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
-	dbb.LoadFields()
+	dbb.Load()
 	_ = dbb.Connect()
 	defer dbb.Close()
 
@@ -69,7 +69,7 @@ func TestServer_AddToCache(t *testing.T) {
 	}
 
 	srv := server.Server{DBService: &dbb}
-	srv.CreateClient()
+	srv.CreateCache()
 
 	err := srv.AddToCache(&data)
 	if err != nil {
@@ -82,21 +82,22 @@ func TestServer_Latest(t *testing.T) {
 	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
-	dbb.LoadFields()
+	dbb.Load()
 	_ = dbb.Connect()
 	defer dbb.Close()
 
 	_ = dbb.Init()
+
+	srv := server.Server{DBService: &dbb}
+	srv.CreateCache()
 
 	data := model.Data{
 		DataType:  util.AirQuality,
 		Value:     183,
 		Timestamp: time.Now().Round(0),
 	}
-	dbb.Add(&data)
 
-	srv := server.Server{DBService: &dbb}
-	srv.CreateClient()
+	_, _ = srv.Add(context.Background(), data.Convert())
 
 	dc, err := srv.Latest(context.Background(), &pb.DataRequest{DataType: pb.DataType_AIR_QUALITY})
 
@@ -109,7 +110,7 @@ func TestServer_Latest(t *testing.T) {
 	if !util.Equals(dc, expected) {
 		t.Error("Objects are not the same")
 		t.Errorf("Expected: %v", expected)
-		t.Errorf("Result: %v", &dc)
+		t.Errorf("Result: %v", dc)
 		t.FailNow()
 	}
 }
@@ -119,7 +120,7 @@ func TestServer_Last24H(t *testing.T) {
 	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
-	dbb.LoadFields()
+	dbb.Load()
 	_ = dbb.Connect()
 	defer dbb.Close()
 
@@ -198,7 +199,7 @@ func TestServer_Last24H(t *testing.T) {
 	}
 
 	srv := server.Server{DBService: &dbb}
-	srv.CreateClient()
+	srv.CreateCache()
 
 	dr, err := srv.Last24H(context.Background(), &pb.DataRequest{DataType: pb.DataType_RAINDROPS})
 	if err != nil {
@@ -223,7 +224,7 @@ func TestServer_Median(t *testing.T) {
 	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
-	dbb.LoadFields()
+	dbb.Load()
 	_ = dbb.Connect()
 	defer dbb.Close()
 
@@ -264,7 +265,7 @@ func TestServer_Median(t *testing.T) {
 	}
 
 	srv := server.Server{DBService: &dbb}
-	srv.CreateClient()
+	srv.CreateCache()
 
 	dc, err := srv.Median(context.Background(), &pb.DataRequest{DataType: pb.DataType_SOIL_MOISTURE})
 	if err != nil {
@@ -292,7 +293,7 @@ func TestServer_Max(t *testing.T) {
 	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
-	dbb.LoadFields()
+	dbb.Load()
 	_ = dbb.Connect()
 	defer dbb.Close()
 
@@ -333,7 +334,7 @@ func TestServer_Max(t *testing.T) {
 	}
 
 	srv := server.Server{DBService: &dbb}
-	srv.CreateClient()
+	srv.CreateCache()
 
 	dc, err := srv.Max(context.Background(), &pb.DataRequest{DataType: pb.DataType_CARBON_MONOXIDE})
 	if err != nil {
@@ -361,7 +362,7 @@ func TestServer_Min(t *testing.T) {
 	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
-	dbb.LoadFields()
+	dbb.Load()
 	_ = dbb.Connect()
 	defer dbb.Close()
 
@@ -402,7 +403,7 @@ func TestServer_Min(t *testing.T) {
 	}
 
 	srv := server.Server{DBService: &dbb}
-	srv.CreateClient()
+	srv.CreateCache()
 
 	dc, err := srv.Min(context.Background(), &pb.DataRequest{DataType: pb.DataType_AIR_QUALITY})
 	if err != nil {

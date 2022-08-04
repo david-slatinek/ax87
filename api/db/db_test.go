@@ -14,7 +14,7 @@ func TestDB_Connect(t *testing.T) {
 	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
-	dbb.LoadFields()
+	dbb.Load()
 
 	if err := dbb.Connect(); err != nil {
 		t.Fatalf("Expected nil with Connect, got %v", err)
@@ -27,7 +27,7 @@ func TestDB_Init(t *testing.T) {
 	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
-	dbb.LoadFields()
+	dbb.Load()
 	_ = dbb.Connect()
 	defer dbb.Close()
 
@@ -41,7 +41,7 @@ func TestDB_Latest(t *testing.T) {
 	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
-	dbb.LoadFields()
+	dbb.Load()
 	_ = dbb.Connect()
 	defer dbb.Close()
 
@@ -128,7 +128,7 @@ func TestDB_Last24H(t *testing.T) {
 	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
-	dbb.LoadFields()
+	dbb.Load()
 	_ = dbb.Connect()
 	defer dbb.Close()
 
@@ -229,7 +229,7 @@ func TestDB_Median(t *testing.T) {
 	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
-	dbb.LoadFields()
+	dbb.Load()
 	_ = dbb.Connect()
 	defer dbb.Close()
 
@@ -295,7 +295,7 @@ func TestDB_Max(t *testing.T) {
 	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
-	dbb.LoadFields()
+	dbb.Load()
 	_ = dbb.Connect()
 	defer dbb.Close()
 
@@ -361,7 +361,7 @@ func TestDB_Min(t *testing.T) {
 	_ = env.Load(util.EnvTestFilePath)
 
 	dbb := db.DB{}
-	dbb.LoadFields()
+	dbb.Load()
 	_ = dbb.Connect()
 	defer dbb.Close()
 

@@ -25,7 +25,7 @@ func main() {
 	}
 
 	dbb := db.DB{}
-	dbb.LoadFields()
+	dbb.Load()
 
 	err = dbb.Connect()
 	if err != nil {
@@ -40,7 +40,7 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 	srv := server.Server{DBService: &dbb}
-	srv.CreateClient()
+	srv.CreateCache()
 	pb.RegisterRequestServer(grpcServer, &srv)
 
 	c := make(chan os.Signal, 1)
@@ -49,7 +49,10 @@ func main() {
 		<-c
 		_, cancel := context.WithTimeout(context.Background(), 15)
 		defer cancel()
+
 		grpcServer.GracefulStop()
+		srv.Close()
+
 		log.Println("Server is shutting down...")
 		os.Exit(0)
 	}()

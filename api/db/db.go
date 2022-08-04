@@ -26,8 +26,8 @@ type DB struct {
 	bucket string
 }
 
-// LoadFields loads DB fields - url, token, org, bucket - from the environment.
-func (db *DB) LoadFields() {
+// Load DB fields - url, token, org, bucket - from the environment.
+func (db *DB) Load() {
 	db.url = os.Getenv("INFLUXDB_URL")
 	db.token = os.Getenv("INFLUXDB_TOKEN")
 	db.org = os.Getenv("ORGANIZATION")
