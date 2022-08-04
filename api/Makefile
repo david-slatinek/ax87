@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-all: testEnv testUtil testDB testServer ## Perform all tests
+all: testEnv testUtil testDB testServer testCache ## Perform all tests
 
 compile: ## Compile api
 	go build -v .
@@ -19,6 +19,9 @@ testDB: ## Test api/db
 
 testServer: ## Test api/server
 	go test api/server -v --cover
+
+testCache: ## Test api/cache
+	go test api/cache -v --cover
 
 clean: ## Delete compiled ./api
 	rm api
