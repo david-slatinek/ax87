@@ -45,10 +45,10 @@ func TestServer_Add(t *testing.T) {
 		t.Error("Objects are not the same")
 		t.Errorf("Expected: %v", &r)
 		t.Errorf("Result: %v", reply)
-		t.FailNow()
 	}
 }
 
+// Test Server.AddToCache.
 func TestServer_AddToCache(t *testing.T) {
 	_ = env.Load(util.EnvTestFilePath)
 
