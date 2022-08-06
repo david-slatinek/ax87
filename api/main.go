@@ -7,6 +7,7 @@ import (
 	"api/server"
 	"context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
 	"os"
@@ -42,6 +43,7 @@ func main() {
 	srv := server.Server{DBService: &dbb}
 	srv.CreateCache()
 	pb.RegisterRequestServer(grpcServer, &srv)
+	reflection.Register(grpcServer)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
