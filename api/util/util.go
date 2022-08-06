@@ -3,8 +3,10 @@ package util
 import (
 	pb "api/schema"
 	"context"
+	"crypto/tls"
 	"golang.org/x/time/rate"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"log"
 	"math"
 	"os"
@@ -97,4 +99,18 @@ func RateLimit(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 		log.Println("Interceptor error:", err)
 	}
 	return handler(ctx, req)
+}
+
+func LoadTLS() (credentials.TransportCredentials, error) {
+	cert, err := tls.LoadX509KeyPair("/cert/server-cert.pem", "/cert/server-key.pem")
+	if err != nil {
+		return nil, err
+	}
+
+	config := tls.Config{
+		Certificates: []tls.Certificate{cert},
+		ClientAuth:   tls.NoClientCert,
+	}
+
+	return credentials.NewTLS(&config), nil
 }

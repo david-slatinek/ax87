@@ -40,7 +40,15 @@ func main() {
 		log.Fatalf("Failed to listen on port 9000 with error: %v", err)
 	}
 
-	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(util.RateLimit))
+	tlsCred, err := util.LoadTLS()
+	if err != nil {
+		log.Fatalf("Failed to set TLS, error: %v", err)
+	}
+
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(util.RateLimit),
+		grpc.Creds(tlsCred),
+	)
 	srv := server.Server{DBService: &dbb}
 	srv.CreateCache()
 	pb.RegisterRequestServer(grpcServer, &srv)
