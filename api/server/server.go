@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
+	"os"
 )
 
 // Server is a struct that acts as an intermediate layer between db.DB and grpc default server.
@@ -30,7 +31,9 @@ func (server *Server) CreateCache() {
 	if err == nil {
 		server.cache = &ca
 	} else {
-		log.Printf("Invalid cache, error: %v", err)
+		if os.Getenv("GO_ENV") == "development" {
+			log.Printf("Invalid cache, error: %v", err)
+		}
 		server.cache = nil
 	}
 }
@@ -40,7 +43,7 @@ func (server *Server) Close() {
 	server.DBService.Close()
 
 	if server.cache != nil {
-		if err := server.cache.Close(); err != nil {
+		if err := server.cache.Close(); err != nil && os.Getenv("GO_ENV") == "development" {
 			log.Printf("Error with cache.Close, error: %v", err)
 		}
 	}
@@ -68,7 +71,7 @@ func (server *Server) Add(_ context.Context, data *pb.Data) (*pb.Reply, error) {
 		Category: util.GetCategory(int(d.Value), d.DataType),
 	})
 
-	if err != nil {
+	if err != nil && os.Getenv("GO_ENV") == "development" {
 		log.Printf("Error with cache add, error: %v", err)
 	}
 
@@ -95,10 +98,10 @@ func (server *Server) Latest(_ context.Context, request *pb.DataRequest) (*pb.Da
 	if server.cache != nil {
 		value, err := server.cache.Get(request.DataType.String())
 
-		if err != nil {
+		if err != nil && os.Getenv("GO_ENV") == "development" {
 			log.Printf("Error with cache get, error: %v", err)
 		} else {
-			if err := json.Unmarshal([]byte(value), &latest); err != nil {
+			if err := json.Unmarshal([]byte(value), &latest); err != nil && os.Getenv("GO_ENV") == "development" {
 				log.Printf("Error with json.Unmarshal, error: %v", err)
 			} else {
 				ok = true
@@ -114,7 +117,7 @@ func (server *Server) Latest(_ context.Context, request *pb.DataRequest) (*pb.Da
 			return nil, err
 		}
 
-		if err = server.AddToCache(latest); err != nil {
+		if err = server.AddToCache(latest); err != nil && os.Getenv("GO_ENV") == "development" {
 			log.Printf("Error with cache set, error: %v", err)
 		}
 	}

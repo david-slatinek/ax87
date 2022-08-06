@@ -43,7 +43,10 @@ func main() {
 	srv := server.Server{DBService: &dbb}
 	srv.CreateCache()
 	pb.RegisterRequestServer(grpcServer, &srv)
-	reflection.Register(grpcServer)
+
+	if os.Getenv("GO_ENV") == "development" {
+		reflection.Register(grpcServer)
+	}
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
