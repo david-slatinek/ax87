@@ -2,8 +2,16 @@ package util
 
 import (
 	pb "api/schema"
+	"context"
+	"golang.org/x/time/rate"
+	"google.golang.org/grpc"
+	"log"
 	"math"
+	"os"
+	"time"
 )
+
+var rateLimiter = rate.NewLimiter(rate.Every(time.Second), 10)
 
 const (
 	// CarbonMonoxide constant.
@@ -82,4 +90,11 @@ func GetCategory(value int, dataType string) int {
 		return MapValue(float64(value), 489, 238, 0, 100)
 	}
 	return -1
+}
+
+func RateLimit(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	if err := rateLimiter.Wait(ctx); err != nil && os.Getenv("GO_ENV") == "development" {
+		log.Println("Interceptor error:", err)
+	}
+	return handler(ctx, req)
 }

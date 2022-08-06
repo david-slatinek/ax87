@@ -5,6 +5,7 @@ import (
 	"api/env"
 	pb "api/schema"
 	"api/server"
+	"api/util"
 	"context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -39,7 +40,7 @@ func main() {
 		log.Fatalf("Failed to listen on port 9000 with error: %v", err)
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(util.RateLimit))
 	srv := server.Server{DBService: &dbb}
 	srv.CreateCache()
 	pb.RegisterRequestServer(grpcServer, &srv)
