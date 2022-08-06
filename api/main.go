@@ -42,18 +42,21 @@ func main() {
 
 	tlsCred, err := util.LoadTLS()
 	if err != nil {
-		log.Fatalf("Failed to set TLS, error: %v", err)
+		log.Fatalf("Failed to use TLS, error: %v", err)
 	}
 
 	grpcServer := grpc.NewServer(
 		grpc.UnaryInterceptor(util.RateLimit),
 		grpc.Creds(tlsCred),
 	)
-	srv := server.Server{DBService: &dbb}
+	srv := server.Server{
+		DBService:   &dbb,
+		Development: os.Getenv("GO_ENV") == "development",
+	}
 	srv.CreateCache()
 	pb.RegisterRequestServer(grpcServer, &srv)
 
-	if os.Getenv("GO_ENV") == "development" {
+	if srv.Development {
 		reflection.Register(grpcServer)
 	}
 

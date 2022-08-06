@@ -29,5 +29,13 @@ func Validate() error {
 		return errors.New("empty BUCKET")
 	}
 
+	if os.Getenv("REDIS_URL") == "" {
+		return errors.New("empty REDIS_URL")
+	}
+
+	if os.Getenv("GO_ENV") == "" {
+		return errors.New("empty GO_ENV")
+	}
+
 	return nil
 }

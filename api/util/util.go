@@ -94,7 +94,7 @@ func GetCategory(value int, dataType string) int {
 	return -1
 }
 
-func RateLimit(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func RateLimit(ctx context.Context, req interface{}, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	if err := rateLimiter.Wait(ctx); err != nil && os.Getenv("GO_ENV") == "development" {
 		log.Println("Interceptor error:", err)
 	}
@@ -102,15 +102,13 @@ func RateLimit(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 }
 
 func LoadTLS() (credentials.TransportCredentials, error) {
-	cert, err := tls.LoadX509KeyPair("/cert/server-cert.pem", "/cert/server-key.pem")
+	cert, err := tls.LoadX509KeyPair("cert/server-cert.pem", "cert/server-key.pem")
 	if err != nil {
 		return nil, err
 	}
 
 	config := tls.Config{
 		Certificates: []tls.Certificate{cert},
-		ClientAuth:   tls.NoClientCert,
 	}
-
 	return credentials.NewTLS(&config), nil
 }
