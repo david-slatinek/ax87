@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm server-cert.pem server-key.pem server-req.pem
+rm *.pem
 
 # Create server private key
 openssl genpkey -out server-key.pem -algorithm EC -pkeyopt ec_paramgen_curve:P-256

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm ca-cert.pem ca-cert.srl ca-key.pem
+rm *.pem ca-cert.srl
 
 # Create Certificate Authority (CA) private key
 openssl genpkey -out ca-key.pem -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -aes-256-cbc
