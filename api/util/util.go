@@ -102,7 +102,7 @@ func RateLimit(ctx context.Context, req interface{}, _ *grpc.UnaryServerInfo, ha
 }
 
 func LoadTLS() (credentials.TransportCredentials, error) {
-	cert, err := tls.LoadX509KeyPair("cert/server-cert.pem", "cert/server-key.pem")
+	cert, err := tls.LoadX509KeyPair("server-cert/server-cert.pem", "server-cert/server-key.pem")
 	if err != nil {
 		return nil, err
 	}
