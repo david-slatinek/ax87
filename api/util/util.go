@@ -25,8 +25,19 @@ const (
 	// SoilMoisture constant.
 	SoilMoisture = "SOIL_MOISTURE"
 
-	// EnvTestFilePath location for test.env.
+	// EnvTestFilePath path for the file 'test.env'.
 	EnvTestFilePath = "../env/test.env"
+
+	// serverFolder path for the server certificate folder.
+	serverFolder = "server-cert"
+	// serverCert server certificate name.
+	serverCert = "server-cert.pem"
+	// serverKey server key name.
+	serverKey = "server-key.pem"
+	// certFile server certification.
+	certFile = serverFolder + "/" + serverCert
+	// keyFile server key file.
+	keyFile = serverFolder + "/" + serverKey
 )
 
 // MapCO2 value to 7 categories, with 1 being the best.
@@ -102,13 +113,13 @@ func RateLimit(ctx context.Context, req interface{}, _ *grpc.UnaryServerInfo, ha
 }
 
 func LoadTLS() (credentials.TransportCredentials, error) {
-	cert, err := tls.LoadX509KeyPair("server-cert/server-cert.pem", "server-cert/server-key.pem")
+	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 	if err != nil {
 		return nil, err
 	}
 
-	config := tls.Config{
+	config := &tls.Config{
 		Certificates: []tls.Certificate{cert},
 	}
-	return credentials.NewTLS(&config), nil
+	return credentials.NewTLS(config), nil
 }

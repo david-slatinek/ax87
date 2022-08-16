@@ -25,12 +25,12 @@ type Server struct {
 
 // CreateCache creates server cache.
 func (server *Server) CreateCache() {
-	ca := cache.Cache{}
+	ca := &cache.Cache{}
 	ca.Load()
 	err := ca.Create()
 
 	if err == nil {
-		server.cache = &ca
+		server.cache = ca
 	} else {
 		if server.Development {
 			log.Printf("Invalid cache, error: %v", err)

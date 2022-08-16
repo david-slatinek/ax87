@@ -133,11 +133,11 @@ func (db *DB) Latest(dataType string) (*model.DataResponse, error) {
 			|> filter(fn: (r) => r._measurement == "%s")
 			|> last()`, db.bucket, dataType)
 
-	dr := model.DataResponse{}
+	dr := &model.DataResponse{}
 
 	result, err := queryAPI.Query(context.Background(), query)
 	if err != nil || result.Err() != nil {
-		return &dr, err
+		return dr, err
 	}
 
 	isData := false
@@ -163,13 +163,13 @@ func (db *DB) Latest(dataType string) (*model.DataResponse, error) {
 	}
 
 	if !isData {
-		return &dr, errors.New("no data")
+		return dr, errors.New("no data")
 	}
 
 	dr.DataType = result.Record().Measurement()
 	dr.Timestamp = result.Record().Time().Local()
 
-	return &dr, nil
+	return dr, nil
 }
 
 // Last24H returns data for the last 24 hours for the requested dataType.
@@ -253,7 +253,7 @@ func (db *DB) RetrieveData(query, dataType string) (*model.DataResponse, error) 
 		return nil, err
 	}
 
-	dr := model.DataResponse{}
+	dr := &model.DataResponse{}
 	isData := false
 
 	for result.Next() {
@@ -266,14 +266,14 @@ func (db *DB) RetrieveData(query, dataType string) (*model.DataResponse, error) 
 	}
 
 	if !isData {
-		return &dr, errors.New("no data")
+		return dr, errors.New("no data")
 	}
 
 	dr.DataType = result.Record().Measurement()
 	dr.Timestamp = result.Record().Time().Local()
 	dr.Category = util.GetCategory(int(dr.Value), dataType)
 
-	return &dr, nil
+	return dr, nil
 }
 
 // Median returns median data for the last 24 hours for the requested dataType.

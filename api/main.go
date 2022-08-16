@@ -26,7 +26,7 @@ func main() {
 		log.Fatalf(err.Error())
 	}
 
-	dbb := db.DB{}
+	dbb := &db.DB{}
 	dbb.Load()
 
 	err = dbb.Connect()
@@ -49,12 +49,12 @@ func main() {
 		grpc.UnaryInterceptor(util.RateLimit),
 		grpc.Creds(tlsCred),
 	)
-	srv := server.Server{
-		DBService:   &dbb,
+	srv := &server.Server{
+		DBService:   dbb,
 		Development: os.Getenv("GO_ENV") == "development",
 	}
 	srv.CreateCache()
-	pb.RegisterRequestServer(grpcServer, &srv)
+	pb.RegisterRequestServer(grpcServer, srv)
 
 	if srv.Development {
 		reflection.Register(grpcServer)

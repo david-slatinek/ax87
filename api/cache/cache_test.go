@@ -14,11 +14,11 @@ import (
 func TestCache_Create(t *testing.T) {
 	_ = env.Load(util.EnvTestFilePath)
 
-	ca := cache.Cache{}
+	ca := &cache.Cache{}
 	ca.Load()
 	defer func(ca *cache.Cache) {
 		_ = ca.Close()
-	}(&ca)
+	}(ca)
 
 	if err := ca.Create(); err != nil {
 		t.Errorf("Expected nil with Create, got %v", err)
@@ -43,15 +43,15 @@ func TestCache_Close(t *testing.T) {
 func TestCache_Add(t *testing.T) {
 	_ = env.Load(util.EnvTestFilePath)
 
-	ca := cache.Cache{}
+	ca := &cache.Cache{}
 	ca.Load()
 	defer func(ca *cache.Cache) {
 		_ = ca.Close()
-	}(&ca)
+	}(ca)
 
 	_ = ca.Create()
 
-	dr := model.DataResponse{
+	dr := &model.DataResponse{
 		Data: model.Data{
 			DataType:  util.SoilMoisture,
 			Value:     305,
@@ -60,7 +60,7 @@ func TestCache_Add(t *testing.T) {
 		Category: util.GetCategory(305, util.SoilMoisture),
 	}
 
-	if err := ca.Add(&dr); err != nil {
+	if err := ca.Add(dr); err != nil {
 		t.Errorf("Expected nil with Add, got %v", err)
 	}
 }
@@ -69,15 +69,15 @@ func TestCache_Add(t *testing.T) {
 func TestCache_Get(t *testing.T) {
 	_ = env.Load(util.EnvTestFilePath)
 
-	ca := cache.Cache{}
+	ca := &cache.Cache{}
 	ca.Load()
 	defer func(ca *cache.Cache) {
 		_ = ca.Close()
-	}(&ca)
+	}(ca)
 
 	_ = ca.Create()
 
-	dr := model.DataResponse{
+	dr := &model.DataResponse{
 		Data: model.Data{
 			DataType:  util.Raindrops,
 			Value:     100,
@@ -85,7 +85,7 @@ func TestCache_Get(t *testing.T) {
 		},
 		Category: util.GetCategory(100, util.Raindrops),
 	}
-	_ = ca.Add(&dr)
+	_ = ca.Add(dr)
 
 	value, err := ca.Get(util.Raindrops)
 
