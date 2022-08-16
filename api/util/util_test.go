@@ -3,6 +3,7 @@ package util_test
 import (
 	pb "api/schema"
 	"api/util"
+	"crypto/tls"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"testing"
 	"time"
@@ -205,5 +206,12 @@ func TestGetCategory(t *testing.T) {
 		if ans != value.expected {
 			t.Errorf("Expected %d with GetCategory(%d), got %d", value.expected, value.value, ans)
 		}
+	}
+}
+
+func TestLoadTLS(t *testing.T) {
+	_, err := tls.LoadX509KeyPair("../server-cert/server-cert.pem", "../server-cert/server-key.pem")
+	if err != nil {
+		t.Fatalf("Expected nil with LoadTLS, got %v", err)
 	}
 }

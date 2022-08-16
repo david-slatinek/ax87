@@ -105,6 +105,7 @@ func GetCategory(value int, dataType string) int {
 	return -1
 }
 
+// RateLimit limit request rate - 10 request per second.
 func RateLimit(ctx context.Context, req interface{}, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	if err := rateLimiter.Wait(ctx); err != nil && os.Getenv("GO_ENV") == "development" {
 		log.Println("Interceptor error:", err)
@@ -112,6 +113,7 @@ func RateLimit(ctx context.Context, req interface{}, _ *grpc.UnaryServerInfo, ha
 	return handler(ctx, req)
 }
 
+// LoadTLS loads TLS certificate.
 func LoadTLS() (credentials.TransportCredentials, error) {
 	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 	if err != nil {
