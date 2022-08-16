@@ -62,7 +62,13 @@ func LoadTLS() (credentials.TransportCredentials, error) {
 		return nil, errors.New("failed to add server CA certificate")
 	}
 
+	cert, err := tls.LoadX509KeyPair("../cert/client-cert/client-cert.pem", "../cert/client-cert/client-key.pem")
+	if err != nil {
+		return nil, err
+	}
+
 	config := &tls.Config{
+		Certificates: []tls.Certificate{cert},
 		RootCAs: certPool,
 	}
 
@@ -154,7 +160,7 @@ func main() {
 	//}
 
 	if *uploadPtr {
-		_, err := Upload(1, 45.4, client)
+		_, err := Upload(1, 42.4, client)
 		if err != nil {
 			log.Println(err)
 		}

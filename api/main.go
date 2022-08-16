@@ -39,11 +39,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to listen on port 9000 with error: %v", err)
 	}
-	defer func(listener net.Listener) {
-		if err := listener.Close(); err != nil {
-			log.Printf("Expected nil with listener.Close, got %v", err)
-		}
-	}(listener)
 
 	tlsCred, err := util.LoadTLS()
 	if err != nil {

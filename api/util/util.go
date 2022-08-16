@@ -4,9 +4,12 @@ import (
 	pb "api/schema"
 	"context"
 	"crypto/tls"
+	"crypto/x509"
+	"errors"
 	"golang.org/x/time/rate"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"io/ioutil"
 	"log"
 	"math"
 	"os"
@@ -38,6 +41,8 @@ const (
 	certFile = serverFolder + "/" + serverCert
 	// keyFile server key file.
 	keyFile = serverFolder + "/" + serverKey
+	// caPath CA certificate path.
+	caPath = "../cert/ca-cert/ca-cert.pem"
 )
 
 // MapCO2 value to 7 categories, with 1 being the best.
@@ -120,8 +125,20 @@ func LoadTLS() (credentials.TransportCredentials, error) {
 		return nil, err
 	}
 
+	clientCa, err := ioutil.ReadFile(caPath)
+	if err != nil {
+		return nil, err
+	}
+
+	certPool := x509.NewCertPool()
+	if !certPool.AppendCertsFromPEM(clientCa) {
+		return nil, errors.New("failed to add client CA certificate")
+	}
+
 	config := &tls.Config{
 		Certificates: []tls.Certificate{cert},
+		ClientAuth:   tls.RequireAndVerifyClientCert,
+		ClientCAs:    certPool,
 	}
 	return credentials.NewTLS(config), nil
 }
