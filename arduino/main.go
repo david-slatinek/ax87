@@ -8,6 +8,7 @@ import (
 	"crypto/x509"
 	"errors"
 	"flag"
+	"fmt"
 	"github.com/tarm/serial"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -69,32 +70,32 @@ func LoadTLS() (credentials.TransportCredentials, error) {
 
 	config := &tls.Config{
 		Certificates: []tls.Certificate{cert},
-		RootCAs: certPool,
+		RootCAs:      certPool,
 	}
 
 	return credentials.NewTLS(config), nil
 }
 
 func main() {
-	//readPtr := flag.Int("read", 0, "Read sensor value/values\n\t0 = all (default)\n\t1 = carbon monoxide\n\t2 = air quality\n\t3 = raindrops\n\t4 = soil moisture")
+	readPtr := flag.Int("read", 0, "Read sensor value/values\n\t0 = all (default)\n\t1 = carbon monoxide\n\t2 = air quality\n\t3 = raindrops\n\t4 = soil moisture")
 	uploadPtr := flag.Bool("upload", false, "Upload read data to the API")
 
 	flag.Parse()
 
-	//if *readPtr < 0 || *readPtr > 4 {
-	//	log.Fatal("Invalid value for -read argument, exiting")
-	//}
+	if *readPtr < 0 || *readPtr > 4 {
+		log.Fatal("Invalid value for -read argument, exiting")
+	}
 
-	//c := &serial.Config{Name: "/dev/ttyACM0", Baud: 9600, ReadTimeout: time.Second * 5}
-	//s, err := serial.OpenPort(c)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//defer func(s *serial.Port) {
-	//	if err := s.Close(); err != nil {
-	//		log.Println(err)
-	//	}
-	//}(s)
+	c := &serial.Config{Name: "/dev/ttyACM0", Baud: 9600, ReadTimeout: time.Second * 5}
+	s, err := serial.OpenPort(c)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func(s *serial.Port) {
+		if err := s.Close(); err != nil {
+			log.Println(err)
+		}
+	}(s)
 
 	tlsCred, err := LoadTLS()
 	if err != nil && *uploadPtr {
@@ -123,46 +124,39 @@ func main() {
 	_, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	//if *readPtr == 0 {
-	//	for i := 1; i <= 4; i++ {
-	//		data, err := readFromSerial(s, i)
-	//		fmt.Println("Argument:", i)
-	//
-	//		if err != nil {
-	//			log.Println(err)
-	//		} else {
-	//			fmt.Println("Result:", data)
-	//
-	//			if *uploadPtr {
-	//				_, err := Upload(i, data, client)
-	//				if err != nil {
-	//					log.Println(err)
-	//				}
-	//			}
-	//		}
-	//		time.Sleep(time.Second)
-	//	}
-	//	return
-	//}
+	if *readPtr == 0 {
+		for i := 1; i <= 4; i++ {
+			data, err := readFromSerial(s, i)
+			fmt.Println("Argument:", i)
 
-	//data, err := readFromSerial(s, *readPtr)
-	//if err != nil {
-	//	log.Println(err)
-	//} else {
-	//	fmt.Println("Result:", data)
-	//
-	//	if *uploadPtr {
-	//		_, err := Upload(*readPtr, data, client)
-	//		if err != nil {
-	//			log.Println(err)
-	//		}
-	//	}
-	//}
+			if err != nil {
+				log.Println(err)
+			} else {
+				fmt.Println("Result:", data)
 
-	if *uploadPtr {
-		_, err := Upload(1, 42.4, client)
-		if err != nil {
-			log.Println(err)
+				if *uploadPtr {
+					_, err := Upload(i, data, client)
+					if err != nil {
+						log.Println(err)
+					}
+				}
+			}
+			time.Sleep(time.Second)
+		}
+		return
+	}
+
+	data, err := readFromSerial(s, *readPtr)
+	if err != nil {
+		log.Println(err)
+	} else {
+		fmt.Println("Result:", data)
+
+		if *uploadPtr {
+			_, err := Upload(*readPtr, data, client)
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	}
 }
