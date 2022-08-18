@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/go-redis/redis/v9"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
@@ -55,11 +56,11 @@ func (server *Server) Close() {
 // Add new data to the db.
 func (server *Server) Add(_ context.Context, data *pb.Data) (*pb.Reply, error) {
 	if data == nil {
-		return &pb.Reply{}, errors.New("data can't be nil")
+		return nil, status.Error(codes.InvalidArgument, "invalid request data, can't be nil")
 	}
 
 	if data.GetDataType() == pb.DataType_NONE {
-		return &pb.Reply{}, errors.New("invalid data type")
+		return nil, status.Error(codes.InvalidArgument, "invalid data type")
 	}
 
 	d := model.Data{
@@ -92,7 +93,7 @@ func (server *Server) AddToCache(dr *model.DataResponse) error {
 // Latest returns the latest data for the requested dataType.
 func (server *Server) Latest(_ context.Context, request *pb.DataRequest) (*pb.DataWithCategory, error) {
 	if request == nil {
-		return nil, errors.New("request can't be nil")
+		return nil, status.Error(codes.InvalidArgument, "request can't be nil")
 	}
 
 	var latest *model.DataResponse
@@ -106,7 +107,7 @@ func (server *Server) Latest(_ context.Context, request *pb.DataRequest) (*pb.Da
 		} else {
 			if err := json.Unmarshal([]byte(value), &latest); err != nil && server.Development {
 				log.Printf("Error with json.Unmarshal, error: %v", err)
-			} else if value != "" {
+			} else if err != redis.Nil && value != "" {
 				ok = true
 			}
 		}
@@ -117,8 +118,7 @@ func (server *Server) Latest(_ context.Context, request *pb.DataRequest) (*pb.Da
 
 		latest, err = server.DBService.Latest(request.GetDataType().String())
 		if err != nil {
-			return nil, status.Error(codes.NotFound, "id was not found")
-			//return nil, err
+			return nil, status.Error(codes.NotFound, err.Error())
 		}
 
 		if err = server.AddToCache(latest); err != nil && server.Development {
@@ -132,12 +132,12 @@ func (server *Server) Latest(_ context.Context, request *pb.DataRequest) (*pb.Da
 // Last24H returns data for the last 24 hours for the requested dataType.
 func (server *Server) Last24H(_ context.Context, request *pb.DataRequest) (*pb.DataRepeated, error) {
 	if request == nil {
-		return nil, errors.New("request can't be nil")
+		return nil, status.Error(codes.InvalidArgument, "request can't be nil")
 	}
 
 	last, err := server.DBService.Last24H(request.GetDataType().String())
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.NotFound, err.Error())
 	}
 
 	var dc []*pb.DataWithCategory
@@ -152,12 +152,12 @@ func (server *Server) Last24H(_ context.Context, request *pb.DataRequest) (*pb.D
 // Median returns median data for the last 24 hours for the requested dataType.
 func (server *Server) Median(_ context.Context, request *pb.DataRequest) (*pb.DataWithCategory, error) {
 	if request == nil {
-		return nil, errors.New("request can't be nil")
+		return nil, status.Error(codes.InvalidArgument, "request can't be nil")
 	}
 
 	median, err := server.DBService.Median(request.GetDataType().String())
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.NotFound, err.Error())
 	}
 
 	return median.Convert(), nil
@@ -166,12 +166,12 @@ func (server *Server) Median(_ context.Context, request *pb.DataRequest) (*pb.Da
 // Max returns maximum data for the last 24 hours for the requested dataType.
 func (server *Server) Max(_ context.Context, request *pb.DataRequest) (*pb.DataWithCategory, error) {
 	if request == nil {
-		return nil, errors.New("request can't be nil")
+		return nil, status.Error(codes.InvalidArgument, "request can't be nil")
 	}
 
 	max, err := server.DBService.Max(request.GetDataType().String())
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.NotFound, err.Error())
 	}
 
 	return max.Convert(), nil
@@ -180,12 +180,12 @@ func (server *Server) Max(_ context.Context, request *pb.DataRequest) (*pb.DataW
 // Min returns minimum data for the last 24 hours for the requested dataType.
 func (server *Server) Min(_ context.Context, request *pb.DataRequest) (*pb.DataWithCategory, error) {
 	if request == nil {
-		return nil, errors.New("request can't be nil")
+		return nil, status.Error(codes.InvalidArgument, "request can't be nil")
 	}
 
 	min, err := server.DBService.Min(request.GetDataType().String())
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.NotFound, err.Error())
 	}
 
 	return min.Convert(), nil
