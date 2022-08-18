@@ -50,13 +50,24 @@ func (db *DB) Connect() error {
 	db.client = influxdb2.NewClientWithOptions(db.url, db.token,
 		influxdb2.DefaultOptions().SetUseGZip(true))
 
-	status, err := db.client.Health(context.Background())
-	if err != nil {
-		return err
-	}
+	if os.Getenv("GO_ENV") == "development" {
+		status, err := db.client.Health(context.Background())
+		if err != nil {
+			return err
+		}
 
-	if status.Status != domain.HealthCheckStatusPass {
-		return errors.New("server error")
+		if status.Status != domain.HealthCheckStatusPass {
+			return errors.New("server error with status")
+		}
+	} else {
+		ok, err := db.client.Ping(context.Background())
+		if err != nil {
+			return err
+		}
+
+		if !ok {
+			return errors.New("ping failed")
+		}
 	}
 
 	return nil

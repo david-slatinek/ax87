@@ -9,6 +9,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"log"
 )
 
@@ -104,7 +106,7 @@ func (server *Server) Latest(_ context.Context, request *pb.DataRequest) (*pb.Da
 		} else {
 			if err := json.Unmarshal([]byte(value), &latest); err != nil && server.Development {
 				log.Printf("Error with json.Unmarshal, error: %v", err)
-			} else {
+			} else if value != "" {
 				ok = true
 			}
 		}
@@ -115,7 +117,8 @@ func (server *Server) Latest(_ context.Context, request *pb.DataRequest) (*pb.Da
 
 		latest, err = server.DBService.Latest(request.GetDataType().String())
 		if err != nil {
-			return nil, err
+			return nil, status.Error(codes.NotFound, "id was not found")
+			//return nil, err
 		}
 
 		if err = server.AddToCache(latest); err != nil && server.Development {
