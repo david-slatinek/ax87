@@ -3,15 +3,15 @@ import ExploreContainer from '../components/ExploreContainer';
 import React from "react";
 import Header from "../components/Header";
 
-const View: React.FC = () => {
+const Type: React.FC = () => {
     return (
         <IonPage>
-            <Header title="Last 24H"/>
+            <Header title="Type"/>
             <IonContent fullscreen color="light">
-                <ExploreContainer name="View page"/>
+                <ExploreContainer name="Data type"/>
             </IonContent>
         </IonPage>
     );
 };
 
-export default View;
+export default Type;
