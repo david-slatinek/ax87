@@ -12,7 +12,7 @@ import {
 import {IonReactRouter} from '@ionic/react-router';
 import {code, home, list} from 'ionicons/icons';
 import Home from './pages/Home';
-import Tab2 from './pages/Tab2';
+import View from './pages/View';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -39,8 +39,8 @@ const App: React.FC = () => (
                         <Home/>
                     </Route>
 
-                    <Route exact path="/tab2">
-                        <Tab2/>
+                    <Route exact path="/view">
+                        <View/>
                     </Route>
 
                     <Route exact path="/tab3">
@@ -48,7 +48,7 @@ const App: React.FC = () => (
                     </Route>
 
                     <Route exact path="/">
-                        <Redirect to="/tab1"/>
+                        <Redirect to="/home"/>
                     </Route>
                 </IonRouterOutlet>
 
@@ -58,7 +58,7 @@ const App: React.FC = () => (
                         <IonLabel>Home</IonLabel>
                     </IonTabButton>
 
-                    <IonTabButton tab="tab2" href="/tab2">
+                    <IonTabButton tab="view" href="/view">
                         <IonIcon icon={list}/>
                         <IonLabel>View</IonLabel>
                     </IonTabButton>
