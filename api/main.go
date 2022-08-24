@@ -33,7 +33,6 @@ func main() {
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
-	defer dbb.Close()
 
 	listener, err := net.Listen("tcp", ":9000")
 	if err != nil {
@@ -53,7 +52,9 @@ func main() {
 		DBService:   dbb,
 		Development: os.Getenv("GO_ENV") == "development",
 	}
+	defer srv.Close()
 	srv.CreateCache()
+
 	pb.RegisterRequestServer(grpcServer, srv)
 
 	if srv.Development {

@@ -69,7 +69,6 @@ func (db *DB) Connect() error {
 			return errors.New("ping failed")
 		}
 	}
-
 	return nil
 }
 

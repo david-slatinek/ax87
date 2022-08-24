@@ -75,8 +75,11 @@ func (server *Server) Add(_ context.Context, data *pb.Data) (*pb.Reply, error) {
 		Category: util.GetCategory(int(d.Value), d.DataType),
 	})
 
-	if err != nil && server.Development {
-		log.Printf("Error with cache add, error: %v", err)
+	if err != nil {
+		if server.Development {
+			log.Printf("Error with cache add, error: %v", err)
+		}
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &pb.Reply{}, nil
