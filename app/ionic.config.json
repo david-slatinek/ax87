@@ -1,0 +1,7 @@
+{
+  "name": "ax87",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
