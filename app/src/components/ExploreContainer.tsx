@@ -1,4 +1,5 @@
 import './ExploreContainer.css';
+import React from "react";
 
 interface ContainerProps {
   name: string;

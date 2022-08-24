@@ -11,7 +11,7 @@ import {
 } from '@ionic/react';
 import {IonReactRouter} from '@ionic/react-router';
 import {code, home, list} from 'ionicons/icons';
-import Tab1 from './pages/Tab1';
+import Home from './pages/Home';
 import Tab2 from './pages/Tab2';
 
 /* Core CSS required for Ionic components to work properly */
@@ -35,8 +35,8 @@ const App: React.FC = () => (
             <IonTabs>
 
                 <IonRouterOutlet>
-                    <Route exact path="/tab1">
-                        <Tab1/>
+                    <Route exact path="/home">
+                        <Home/>
                     </Route>
 
                     <Route exact path="/tab2">
@@ -53,7 +53,7 @@ const App: React.FC = () => (
                 </IonRouterOutlet>
 
                 <IonTabBar slot="bottom">
-                    <IonTabButton tab="tab1" href="/tab1">
+                    <IonTabButton tab="home" href="/home">
                         <IonIcon icon={home}/>
                         <IonLabel>Home</IonLabel>
                     </IonTabButton>
