@@ -13,8 +13,8 @@ const View: React.FC = () => {
             <IonContent fullscreen color="light">
                 <IonList>
                     {
-                        data.map((d) => (
-                            <DataCard data={d}/>
+                        data.map((d, index) => (
+                            <DataCard key={index} data={d}/>
                         ))
                     }
                 </IonList>
