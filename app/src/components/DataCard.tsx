@@ -10,15 +10,20 @@ import Data from "../model/Data";
 
 interface DataCardProps {
     data: Data;
-    title: string;
+    title?: string;
 }
 
 const DataCard: React.FC<DataCardProps> = ({data, title}) => {
     return (
         <IonCard>
             <IonCardHeader color="warning">
-                <IonCardSubtitle>{data.getTimestamp()}</IonCardSubtitle>
-                <IonCardTitle>{title}</IonCardTitle>
+                {
+                    title != null ?
+                        <>
+                            <IonCardSubtitle>{data.getTimestamp()}</IonCardSubtitle>
+                            <IonCardTitle>{title}</IonCardTitle></> :
+                        <IonCardTitle>{data.getTimestamp()}</IonCardTitle>
+                }
             </IonCardHeader>
 
             <IonItem>

@@ -1,14 +1,23 @@
-import {IonContent, IonPage} from '@ionic/react';
-import ExploreContainer from '../components/ExploreContainer';
+import {IonContent, IonList, IonPage} from '@ionic/react';
 import React from "react";
 import Header from "../components/Header";
+import Data from "../model/Data";
+import DataCard from "../components/DataCard";
 
 const View: React.FC = () => {
+    let data: Data[] = [Data.build(), Data.build(), Data.build(), Data.build()];
+
     return (
         <IonPage>
             <Header title="Last 24H"/>
             <IonContent fullscreen color="light">
-                <ExploreContainer name="View page"/>
+                <IonList>
+                    {
+                        data.map((d) => (
+                            <DataCard data={d}/>
+                        ))
+                    }
+                </IonList>
             </IonContent>
         </IonPage>
     );
