@@ -32,7 +32,7 @@ const DataCard: React.FC<DataCardProps> = ({data, title}) => {
             </IonItem>
             <IonItem>
                 <IonLabel>Category</IonLabel>
-                <IonText>{data.category}</IonText>
+                <IonText>{data.getCategoryWithSymbol()}</IonText>
             </IonItem>
         </IonCard>
     );

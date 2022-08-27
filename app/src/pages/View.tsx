@@ -1,11 +1,13 @@
 import {IonContent, IonList, IonPage} from '@ionic/react';
 import React from "react";
 import Header from "../components/Header";
-import Data from "../model/Data";
 import DataCard from "../components/DataCard";
+import Client from "../service/Client";
 
 const View: React.FC = () => {
-    let data: Data[] = [Data.build(), Data.build(), Data.build(), Data.build()];
+    // let data: Data[] = [Data.build(), Data.build(), Data.build(), Data.build()];
+
+    const data = Client.getInstance().today;
 
     return (
         <IonPage>
