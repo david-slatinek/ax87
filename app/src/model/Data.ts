@@ -8,7 +8,7 @@ export enum DataType {
 export class Data {
     private readonly dataType: DataType;
     private readonly value: number;
-    private readonly timestamp: Date;
+    private readonly _timestamp: Date;
     private readonly category: number;
     private readonly symbol: string
     private readonly categorySymbol: string;
@@ -16,7 +16,7 @@ export class Data {
     constructor(dataType: DataType, value: number, timestamp: Date) {
         this.dataType = dataType;
         this.value = +value.toFixed(2);
-        this.timestamp = timestamp;
+        this._timestamp = timestamp;
         this.category = +Data.getCategory(dataType, value).toFixed(2);
         this.symbol = Data.getSymbol(dataType);
         this.categorySymbol = Data.getCategorySymbol(dataType);
@@ -121,7 +121,11 @@ export class Data {
     }
 
     public getTimestamp() {
-        return this.timestamp.toLocaleString();
+        return this._timestamp.toLocaleString();
+    }
+
+    public get timestamp() {
+        return this._timestamp;
     }
 
     public getValueWithSymbol() {
