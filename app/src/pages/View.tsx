@@ -1,13 +1,16 @@
-import {IonContent, IonList, IonPage} from '@ionic/react';
-import React from "react";
+import {IonContent, IonList, IonPage, useIonViewWillEnter} from '@ionic/react';
+import React, {useState} from "react";
 import Header from "../components/Header";
 import DataCard from "../components/DataCard";
 import Client from "../service/Client";
 
 const View: React.FC = () => {
-    // let data: Data[] = [Data.build(), Data.build(), Data.build(), Data.build()];
+    const client = Client.getInstance();
+    let [count, setCount] = useState(0);
 
-    const data = Client.getInstance().today;
+    useIonViewWillEnter(() => {
+        setCount(count++);
+    });
 
     return (
         <IonPage>
@@ -15,7 +18,7 @@ const View: React.FC = () => {
             <IonContent fullscreen color="light">
                 <IonList>
                     {
-                        data.map((d, index) => (
+                        client.today.map((d, index) => (
                             <DataCard key={index} data={d}/>
                         ))
                     }

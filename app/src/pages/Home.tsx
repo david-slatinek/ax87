@@ -1,11 +1,16 @@
-import {IonContent, IonPage} from '@ionic/react';
-import React from "react";
+import {IonContent, IonPage, useIonViewWillEnter} from '@ionic/react';
+import React, {useState} from "react";
 import Header from "../components/Header";
 import DataCard from "../components/DataCard";
 import Client from "../service/Client";
 
 const Home: React.FC = () => {
-    const client = Client.getInstance();
+    const [client] = useState<Client>(Client.getInstance());
+    let [count, setCount] = useState(0);
+
+    useIonViewWillEnter(() => {
+        setCount(count++);
+    });
 
     return (
         <IonPage>

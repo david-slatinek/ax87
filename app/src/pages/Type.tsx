@@ -1,17 +1,18 @@
 import {IonContent, IonItem, IonLabel, IonList, IonPage, IonRadio, IonRadioGroup} from '@ionic/react';
-import React, {useState} from "react";
+import React from "react";
 import Header from "../components/Header";
+import Client from "../service/Client";
 
 const Type: React.FC = () => {
-    const [selected, setSelected] = useState<string>('CARBON_MONOXIDE');
+    const client = Client.getInstance();
 
     return (
         <IonPage>
             <Header title="Type"/>
             <IonContent fullscreen color="light">
                 <IonList>
-                    <IonRadioGroup value={selected} onIonChange={e => {
-                        setSelected(e.detail.value);
+                    <IonRadioGroup value={client.type} onIonChange={e => {
+                        client.type = e.detail.value;
                     }}>
                         <IonItem>
                             <IonLabel>Carbon monoxide</IonLabel>
