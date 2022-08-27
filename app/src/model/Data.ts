@@ -1,11 +1,11 @@
-enum DataType {
+export enum DataType {
     CARBON_MONOXIDE = "CARBON_MONOXIDE",
     AIR_QUALITY = "AIR_QUALITY",
     RAINDROPS = "RAINDROPS",
     SOIL_MOISTURE = "SOIL_MOISTURE"
 }
 
-class Data {
+export class Data {
     private readonly dataType: DataType;
     private readonly value: number;
     private readonly timestamp: Date;
@@ -132,5 +132,3 @@ class Data {
         return this.category + this.categorySymbol;
     }
 }
-
-export default Data;

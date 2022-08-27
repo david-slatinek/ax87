@@ -6,7 +6,7 @@ import {
     IonCardTitle,
     IonItem, IonLabel, IonText,
 } from "@ionic/react";
-import Data from "../model/Data";
+import {Data} from "../model/Data";
 
 interface DataCardProps {
     data: Data;

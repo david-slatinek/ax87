@@ -1,4 +1,4 @@
-import Data from "../model/Data";
+import {Data, DataType} from "../model/Data";
 
 class Client {
     private static _latest: Data;
@@ -6,16 +6,14 @@ class Client {
     private static _max: Data;
     private static _min: Data;
     private static _today: Array<Data>;
-    private static type: string;
+    private static type: DataType = DataType.CARBON_MONOXIDE;
     private static client: Client = new Client();
 
     private constructor() {
-        const dt = Data.getRandomDataType();
-
-        Client._latest = Data.build(dt);
-        Client._median = Data.build(dt);
-        Client._max = Data.build(dt);
-        Client._min = Data.build(dt);
+        Client._latest = Data.build(Client.type);
+        Client._median = Data.build(Client.type);
+        Client._max = Data.build(Client.type);
+        Client._min = Data.build(Client.type);
 
         // for (let i = 0; i < 3; i++) {
         //     Client._today.push(Data.build());
