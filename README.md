@@ -9,13 +9,13 @@
 
 # About
 
-Smart home system with Arduino, InfluxDB, Go, Docker, gRPC, and Ionic.
+Smart home system with Arduino, InfluxDB, Go, gRPC, Docker, and Ionic.
 
 The project consists of 4 main components:
-- Data capture from the sensors using Arduino
-- Database for data storage
-- API for storing and retrieving data
-- Mobile app for displaying the values
+- Data capture from the sensors using Arduino.
+- Database for data storage.
+- API for storing and retrieving data.
+- Mobile app for displaying the values.
 
 # Arduino
 <div align="center">
@@ -23,10 +23,10 @@ The project consists of 4 main components:
 </div>
 
 Arduino is responsible for getting the data from the sensors for the following:
-- Carbon monoxide
-- Air quality
-- Raindrops
-- Soil moisture
+- Carbon monoxide.
+- Air quality.
+- Raindrops.
+- Soil moisture.
 
 After that, it uploads data to the API by calling an appropriate **grpc** method:
 ```go
@@ -58,26 +58,27 @@ More circuit design images can be seen [here](/images/circuit-designs/).
   <img alt="redis" src="https://img.shields.io/badge/redis-CC0000.svg?&style=for-the-badge&logo=redis&logoColor=white"/>
 </div>
 
-The API was made with the language **go** and with **grpc** framework. For the database, we choose **influxdb** being hosted by **influxdb cloud**.
+The API was made with the language **Go** and with the **grpc** framework. For the database, we chose **influxdb**, which is hosted by the **influxdb cloud**.
 
-Data is stored in a single bucket with 4 different measurements:
-- CARBON_MONOXIDE
-- AIR_QUALITY
-- RAINDROPS
-- SOIL_MOISTURE
+Data is stored in a single bucket with four different measurements:
+- CARBON_MONOXIDE.
+- AIR_QUALITY.
+- RAINDROPS.
+- SOIL_MOISTURE.
 
-Each measurement has three fields: *value*, i.e. the recorded value from the sensor, *_time*, i.e. when was the *value* taken, and *category* with it being in the following range:
+Each measurement has three fields: *value*, i. e. the recorded value from the sensor; *_time*, i. e. when the *value* was taken; and *category*, with it being in the following range:
 - For CARBON_MONOXIDE it is [1, 7], with 1 being the best.
 - For AIR_QUALITY it is [1, 6], with 1 being the best.
 - For RAINDROPS it is [1, 4], with 1 indicating no or little rain.
 - For SOIL_MOISTURE it is [0, 100]%, with 0 indicating no soil moisture.
 
-To speed up querying, we used **redis** as an in-memory cache, which stores the latest added data. We also addded support for unit testing, with the appropriate files having the *_test.go* suffix. 
+To speed up queries, we used **Redis** as an in-memory cache, which stores the latest added data. We also added support for unit testing, with the appropriate files having the *_test.go* suffix.
 
-Lasty, we added support for mutual TLS with the help of **openssl**.
+Lastly, we added support for mutual TLS with the help of **OpenSSL**.
 
-Grpc service (*.proto* file) can be seen [here](/api/schema/).
+The grpc service (*.proto* file) can be seen [here](/api/schema/).
 
+Method to get the latest record:
 ```go
 func (server *Server) Latest(_ context.Context, request *pb.DataRequest) (*pb.DataWithCategory, error) {
 	if request == nil {
