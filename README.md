@@ -80,7 +80,8 @@ The grpc service (*.proto* file) can be seen [here](/api/schema/).
 
 Method to get the latest record:
 ```go
-func (server *Server) Latest(_ context.Context, request *pb.DataRequest) (*pb.DataWithCategory, error) {
+func (server *Server) Latest(_ context.Context, 
+request *pb.DataRequest) (*pb.DataWithCategory, error) {
 	if request == nil {
 		return nil, status.Error(codes.InvalidArgument, "request can't be nil")
 	}
@@ -94,7 +95,8 @@ func (server *Server) Latest(_ context.Context, request *pb.DataRequest) (*pb.Da
 		if err != nil && server.Development {
 			log.Printf("Error with cache get, error: %v", err)
 		} else {
-			if err := json.Unmarshal([]byte(value), &latest); err != nil && server.Development {
+			if err := json.Unmarshal([]byte(value), &latest); 
+			err != nil && server.Development {
 				log.Printf("Error with json.Unmarshal, error: %v", err)
 			} else if err != redis.Nil && value != "" {
 				ok = true
