@@ -40,11 +40,10 @@ client.Add(context.Background(), &pb.Data{
 })
 ```
 
-<br>
-
-Sensor schematic:
 <div align="center">
   <img src="./images/circuit-designs/design-all.png" alt="Arduino wiring" height="500" width="700">
+  <br/>
+  <i>Sensors schematic.</i>
 </div>
 
 More circuit design images can be seen [here](/images/circuit-designs/).
