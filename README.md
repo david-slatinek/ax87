@@ -6,6 +6,7 @@
 - [About](#about)
 - [Arduino](#arduino)
 - [API](#api)
+- [App](#app)
 
 # About
 
@@ -39,12 +40,14 @@ client.Add(context.Background(), &pb.Data{
     Timestamp: timestamppb.New(time.Now()),
 })
 ```
+<br/>
 
 <div align="center">
   <img src="./images/circuit-designs/design-all.png" alt="Arduino wiring" height="500" width="700">
   <br/>
   <i>Sensors schematic.</i>
 </div>
+<br/>
 
 More circuit design images can be seen [here](/images/circuit-designs/).
 
@@ -77,7 +80,6 @@ Lastly, we added support for mutual TLS with the help of **OpenSSL**.
 
 The grpc service (*.proto* file) can be seen [here](/api/schema/).
 
-Method to get the latest record:
 ```go
 func (server *Server) Latest(_ context.Context, request *pb.DataRequest) 
 (*pb.DataWithCategory, error) {
@@ -119,3 +121,27 @@ func (server *Server) Latest(_ context.Context, request *pb.DataRequest)
 	return latest.Convert(), nil
 }
 ```
+<p align="center">
+  <i>Method to get the latest record.</i>
+</p>
+
+# App
+<div align="center">
+  <img alt="Ionic" src="https://img.shields.io/badge/Ionic-3880FF?style=for-the-badge&logo=ionic&logoColor=white"/>
+   <img alt="React" src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB"/>
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white"/>
+</div>
+
+The mobile app was made with Ionic, React, and TypeScript. The main app functionality is getting data from the API and displaying it.
+
+The app features the latest, median, maximum, minimum, and all today's values.
+
+<div align="center">
+  <img alt="Main screen 1" src="./images/app/image-1.jpg" width="300"  height="600" />
+  <img alt="Main screen 2" src="./images/app/image-2.jpg" width="300"  height="600" />
+</div>
+
+<div align="center">
+  <img alt="Screen for displaying all today's values" src="./images/app/image-3.jpg" width="300"  height="600" />
+  <img alt="Screen for choosing measurement type" src="./images/app/image-4.jpg" width="300"  height="600" />
+</div>
