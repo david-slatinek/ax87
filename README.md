@@ -10,7 +10,7 @@
 
 # About
 
-Smart home system with Arduino, InfluxDB, Go, gRPC, Docker, and Ionic.
+Smart home system with Arduino, InfluxDB, Go, gRPC, and Ionic.
 
 The project consists of 4 main components:
 - Data capture from the sensors using Arduino.
