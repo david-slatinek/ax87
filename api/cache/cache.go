@@ -27,10 +27,9 @@ func (cache *Cache) Load() {
 func (cache *Cache) Create() error {
 	cache.client = redis.NewClient(&redis.Options{
 		Addr:            cache.url,
-		Password:        cache.password,
-		DB:              0,
 		MaxRetries:      5,
-		MinRetryBackoff: time.Millisecond * 15,
+		MinRetryBackoff: time.Millisecond * 100,
+		DialTimeout:     time.Millisecond * 100,
 	})
 
 	_, err := cache.client.Ping(context.Background()).Result()
