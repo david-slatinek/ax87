@@ -18,6 +18,13 @@ The project consists of 4 main components:
 - API for storing and retrieving data.
 - Mobile app for displaying the values.
 
+<div align="center">
+  <img src="./images/infrastructure.png" alt="Project infrastructure" height="500" width="700">
+  <br/>
+  <i>Project infrastructure.</i>
+</div>
+<br/>
+
 # Arduino
 <div align="center">
   <img alt="Arduino" src="https://img.shields.io/badge/Arduino-00979D?style=for-the-badge&logo=Arduino&logoColor=white"/>
@@ -58,9 +65,13 @@ More circuit design images can be seen [here](/images/circuit-designs/).
   <img alt="openssl" src="https://img.shields.io/badge/OpenSSL-721412?style=for-the-badge&logo=openssl&logoColor=white"/>
   <img alt="InfluxDB" src="https://img.shields.io/badge/InfluxDB-22ADF6?style=for-the-badge&logo=InfluxDB&logoColor=white"/>
   <img alt="redis" src="https://img.shields.io/badge/redis-CC0000.svg?&style=for-the-badge&logo=redis&logoColor=white"/>
+  <img alt="AWS" src="https://img.shields.io/badge/Amazon_AWS-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white"/>
+  <img alt="Amazon EC2" src="https://img.shields.io/badge/Amazon_EC2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white"/>
 </div>
 
-The API was made with the language **Go** and with the **grpc** framework. For the database, we chose **influxdb**, which is hosted by the **influxdb cloud**.
+The API was made with the language **Go** and with the **grpc** framework and is hosted by **AWS EC2**. For the database, we chose **InfluxDB**, which is hosted by the **InfluxDB Cloud**.
+
+Since we have 2 servers for API hosting, we also added **AWS ELB** for distributing network traffic.
 
 Data is stored in a single bucket with four different measurements:
 - CARBON_MONOXIDE.
@@ -74,7 +85,9 @@ Each measurement has three fields: *value*, i. e. the recorded value from the se
 - For RAINDROPS it is [1, 4], with 1 indicating no or little rain.
 - For SOIL_MOISTURE it is [0, 100]%, with 0 indicating no soil moisture.
 
-To speed up queries, we used **Redis** as an in-memory cache, which stores the latest added data. We also added support for unit testing, with the appropriate files having the *_test.go* suffix.
+To speed up queries, we used **Redis** as an in-memory cache, which stores the latest added data and is hosted by **Amazon ElastiCache**.
+
+We also added support for unit testing, with the appropriate files having the *_test.go* suffix.
 
 Lastly, we added support for mutual TLS with the help of **OpenSSL**.
 
