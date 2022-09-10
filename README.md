@@ -10,7 +10,7 @@
 
 # About
 
-Smart home system with Arduino, InfluxDB, Go, gRPC, and Ionic.
+A smart home system with Arduino, InfluxDB, Go, gRPC, and Ionic.
 
 The project consists of 4 main components:
 - Data capture from the sensors using Arduino.
@@ -36,7 +36,7 @@ Arduino is responsible for getting the data from the sensors for the following:
 - Raindrops.
 - Soil moisture.
 
-After that, it uploads data to the API by calling an appropriate **grpc** method:
+After that, it uploads data to the API by calling an appropriate **gRPC** method:
 ```go
 conn, err := grpc.Dial("address", grpc.WithTransportCredentials(tlsCred))
 client := pb.NewRequestClient(conn)
@@ -69,7 +69,7 @@ More circuit design images can be seen [here](/images/circuit-designs/).
   <img alt="Amazon EC2" src="https://img.shields.io/badge/Amazon_EC2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white"/>
 </div>
 
-The API was made with the language **Go** and with the **grpc** framework and is hosted by **AWS EC2**. For the database, we chose **InfluxDB**, which is hosted by the **InfluxDB Cloud**.
+The API was made with the language **Go**, **gRPC** framework and is hosted by **AWS EC2**. For the database, we chose **InfluxDB**, which is hosted by the **InfluxDB Cloud**.
 
 Since we have 2 servers for API hosting, we also added **AWS ELB** for distributing network traffic.
 
@@ -79,7 +79,7 @@ Data is stored in a single bucket with four different measurements:
 - RAINDROPS.
 - SOIL_MOISTURE.
 
-Each measurement has three fields: *value*, i. e. the recorded value from the sensor; *_time*, i. e. when the *value* was taken; and *category*, with it being in the following range:
+Each measurement has three fields: *value*, i.e. the sensor's recorded value; *_time*, i.e. when the *value* was taken; and *category*, with it being in the following range:
 - For CARBON_MONOXIDE it is [1, 7], with 1 being the best.
 - For AIR_QUALITY it is [1, 6], with 1 being the best.
 - For RAINDROPS it is [1, 4], with 1 indicating no or little rain.
@@ -91,7 +91,7 @@ We also added support for unit testing, with the appropriate files having the *_
 
 Lastly, we added support for mutual TLS with the help of **OpenSSL**.
 
-The grpc service (*.proto* file) can be seen [here](/api/schema/).
+The gRPC service (*.proto* file) can be seen [here](/api/schema/).
 
 ```go
 func (server *Server) Latest(_ context.Context, request *pb.DataRequest) 
